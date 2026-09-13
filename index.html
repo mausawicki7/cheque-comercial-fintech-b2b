@@ -234,7 +234,7 @@ section.sec:first-of-type{border-top:0}
 .escr .barra{background:#E9EEF5;padding:8px 12px;display:flex;gap:6px;align-items:center;font-size:12px;color:var(--texto-suave)}
 .escr .barra i{width:10px;height:10px;border-radius:50%;background:#C9D3E0;display:inline-block}
 .escr .barra span{margin-left:8px;background:#fff;border-radius:5px;padding:3px 10px;flex:1;max-width:340px}
-.escr .lay{display:grid;grid-template-columns:150px 1fr;min-height:420px}
+.escr .lay{display:grid;grid-template-columns:150px minmax(0,1fr);min-height:420px}
 .escr .lat{background:var(--azul-tinta);color:#fff;padding:14px 12px}
 .escr .lat .lg{width:80px;color:#fff;margin-bottom:18px}.escr .lat .lg svg{width:100%;height:auto;display:block}
 .escr .lat div{padding:6px 8px;border-radius:5px;font-size:12.5px;opacity:.75;margin-bottom:2px}
@@ -256,16 +256,16 @@ section.sec:first-of-type{border-top:0}
 .escr .caja .fila{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--azul-linea)}
 .escr .caja .fila:last-of-type{border:0}
 .escr .b{display:inline-block;background:var(--azul);color:#fff;font-weight:700;border-radius:6px;padding:7px 12px;margin-top:10px;font-size:12.5px}
-@media (max-width:640px){.escr .lay{grid-template-columns:1fr}.escr .lat{display:flex;gap:4px;flex-wrap:wrap;padding:10px}.escr .lat .lg{display:none}.escr .kpis{grid-template-columns:1fr}}
+@media (max-width:640px){.escr .lay{grid-template-columns:minmax(0,1fr)}.escr .lat{display:flex;gap:4px;flex-wrap:wrap;padding:10px}.escr .lat .lg{display:none}.escr .kpis{grid-template-columns:1fr}.escr .tabla{overflow-x:auto;-webkit-overflow-scrolling:touch}.escr .tabla table{min-width:340px}}
 
 /* ---------- casos de uso ---------- */
-.caso{display:grid;grid-template-columns:1fr 300px;gap:32px;align-items:start;padding:30px 0;border-top:1px solid var(--azul-linea)}
+.caso{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:32px;align-items:start;padding:30px 0;border-top:1px solid var(--azul-linea)}
 .caso:first-of-type{border-top:0;padding-top:10px}
 .caso h3{margin-top:0}
 .caso dl{margin:0}
 .caso dt{font-weight:600;color:var(--azul);font-size:15px;margin-top:14px}
 .caso dd{margin:3px 0 0;font-size:17.5px}
-@media (max-width:860px){.caso{grid-template-columns:1fr}.caso .tel{margin:0 auto}}
+@media (max-width:860px){.caso{grid-template-columns:minmax(0,1fr)}.caso .tel{margin:0 auto}}
 
 /* ---------- módulos de pantallas ---------- */
 .modulos{display:grid;gap:16px;margin:24px 0}
@@ -444,7 +444,7 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
       <div class="implica">Detectar círculos cerrados de deuda entre empresas y proponer cancelarlos de una sola vez. Primero con ayuda del equipo de Cheque Comercial; después, de forma automática con el algoritmo que ustedes desarrollaron.</div>
     </div>
     <div class="fila">
-      <div class="dice">Pagos garantidos 100%<small>Solución</small></div>
+      <div class="dice">Pagos garantizados 100%<small>Solución</small></div>
       <div class="implica">Asegurar que ninguna deuda cambie sin la conformidad expresa de todas las partes, y emitir un comprobante digital que cada empresa pueda presentarle a su contador. La garantía por aval (SGR) es una capa que se suma más adelante.</div>
     </div>
     <div class="fila">
@@ -622,7 +622,7 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
     </div></div>
   </div>
 
-  <div class="caso" style="grid-template-columns:1fr">
+  <div class="caso" style="grid-template-columns:minmax(0,1fr)">
     <div>
       <h3>El equipo de Cheque Comercial arma una cadena a mano</h3>
       <dl>
@@ -642,6 +642,7 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
           <div class="main">
             <h5>Nueva cadena de compensación</h5>
             <div class="kpis"><div class="kpi"><div class="k">Empresas activas</div><div class="v">28</div></div><div class="kpi"><div class="k">Deuda total registrada</div><div class="v">$ 4.860.000</div></div><div class="kpi"><div class="k">Compensado este mes</div><div class="v">$ 1.120.000</div></div></div>
+            <div class="tabla">
             <table>
               <tr><th>Deudor</th><th>Acreedor</th><th>Monto</th><th>Vence</th><th>Estado</th></tr>
               <tr class="sel"><td><b>Calzados Martín</b></td><td>Curtiembre del Sur</td><td>$ 100.000</td><td>30/09</td><td><span class="tag">Vigente</span></td></tr>
@@ -650,6 +651,7 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
               <tr><td><b>Distribuidora Rivera</b></td><td>Calzados Martín</td><td>$ 145.000</td><td>20/10</td><td><span class="tag esp">Reservada #0409</span></td></tr>
               <tr><td><b>Curtiembre del Sur</b></td><td>Química Patagonia</td><td>$ 210.000</td><td>02/11</td><td><span class="tag">Vigente</span></td></tr>
             </table>
+            </div>
             <div class="caja">
               <div class="t">Cadena propuesta · 3 empresas</div>
               <div class="fila"><span>Importe compensable por tramo</span><b>$ 60.000</b></div>
