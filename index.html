@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Cheque Comercial · Análisis funcional del MVP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --azul:#0A72E2;
+  --azul-oscuro:#0653A8;
+  --azul-tinta:#12315C;
+  --azul-suave:#EAF2FC;
+  --azul-linea:#C9DCF3;
+  --papel:#FFFFFF;
+  --texto:#1F2A3A;
+  --texto-suave:#5C6B80;
+  --verde:#178F5B;
+  --verde-suave:#E4F5EC;
+  --rojo:#C8442B;
+  --rojo-suave:#FBEAE6;
+  --ambar:#B8760A;
+  --ambar-suave:#FCF2DE;
+  --ancho:720px;
+  --nav:250px;
+  --font:'Source Sans 3', 'Myriad Pro', 'Segoe UI', system-ui, sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;font-family:var(--font);font-size:19px;line-height:1.55;color:var(--texto);background:var(--papel);-webkit-font-smoothing:antialiased}
+a{color:var(--azul)}
+p{margin:0 0 1.1em}
+h1,h2,h3,h4{font-weight:700;line-height:1.15;color:var(--azul-tinta);margin:0}
+strong{font-weight:600;color:var(--azul-tinta)}
+
+/* ---------- portada ---------- */
+.portada{background:var(--azul);color:#fff;min-height:100svh;display:flex;flex-direction:column;justify-content:space-between;padding:40px 6vw 48px}
+.portada .logo{width:200px;color:#fff}
+.portada .logo svg{width:100%;height:auto;display:block}
+.portada .titulo{max-width:820px}
+.portada .sobre{font-size:20px;opacity:.85;margin-bottom:14px}
+.portada h1{color:#fff;font-size:clamp(38px,6vw,68px);font-weight:700;letter-spacing:-.01em}
+.portada .tesis{margin-top:34px;max-width:640px;font-size:clamp(20px,2.4vw,26px);line-height:1.4;font-weight:400;border-left:3px solid rgba(255,255,255,.55);padding-left:20px}
+.portada .pie{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:17px;opacity:.85}
+.portada .pie span+span{text-align:right}
+
+/* ---------- layout ---------- */
+.cuerpo{display:grid;grid-template-columns:var(--nav) 1fr;max-width:1200px;margin:0 auto}
+nav.indice{position:sticky;top:0;align-self:start;height:100svh;overflow:auto;padding:36px 20px 36px 28px;border-right:1px solid var(--azul-linea)}
+nav.indice .marca{width:110px;color:var(--azul);margin-bottom:26px}
+nav.indice .marca svg{width:100%;height:auto;display:block}
+nav.indice ol{list-style:none;margin:0;padding:0;counter-reset:sec}
+nav.indice li{margin:0}
+nav.indice a{display:flex;gap:10px;align-items:baseline;text-decoration:none;color:var(--texto-suave);font-size:15.5px;line-height:1.3;padding:6px 8px;border-radius:6px}
+nav.indice a .n{font-variant-numeric:tabular-nums;color:var(--azul-linea);min-width:18px;font-weight:600}
+nav.indice a.activo{color:var(--azul-tinta);background:var(--azul-suave)}
+nav.indice a.activo .n{color:var(--azul)}
+nav.indice a.pendiente{opacity:.45}
+nav.indice a:hover{color:var(--azul-tinta)}
+nav.indice a:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+.progreso{display:none}
+
+main{padding:20px 6vw 120px;min-width:0}
+section.sec{max-width:var(--ancho);padding:72px 0 24px;border-top:1px solid var(--azul-linea);scroll-margin-top:24px}
+section.sec:first-of-type{border-top:0}
+.sec .num{display:block;color:var(--azul);font-weight:700;font-size:17px;margin-bottom:10px;font-variant-numeric:tabular-nums}
+.sec h2{font-size:clamp(30px,4vw,38px);margin-bottom:22px;letter-spacing:-.01em}
+.sec h3{font-size:24px;margin:36px 0 12px}
+.sec .intro{font-size:22px;line-height:1.45;color:var(--azul-tinta);margin-bottom:26px}
+.nota{background:var(--azul-suave);border-left:3px solid var(--azul);padding:16px 20px;border-radius:0 8px 8px 0;margin:26px 0;font-size:18px}
+.nota strong{display:block;margin-bottom:4px}
+
+/* tabla deck → sistema */
+.traduccion{border-top:2px solid var(--azul-tinta);margin:28px 0 10px}
+.traduccion .fila{display:grid;grid-template-columns:1fr 1.4fr;gap:24px;padding:18px 0;border-bottom:1px solid var(--azul-linea)}
+.traduccion .fila:last-child{border-bottom:2px solid var(--azul-tinta)}
+.traduccion .dice{font-weight:600;color:var(--azul-tinta);font-size:18.5px}
+.traduccion .dice small{display:block;font-weight:400;color:var(--texto-suave);font-size:15px;margin-top:2px}
+.traduccion .implica{font-size:18px;position:relative;padding-left:26px}
+.traduccion .implica::before{content:"→";position:absolute;left:0;top:0;color:var(--azul);font-weight:600}
+.traduccion .cab{display:grid;grid-template-columns:1fr 1.4fr;gap:24px;padding:10px 0;font-size:15px;color:var(--texto-suave)}
+
+/* placeholder de etapas futuras */
+.pendiente-bloque{border:1.5px dashed var(--azul-linea);border-radius:10px;padding:22px 24px;color:var(--texto-suave);font-size:17px;margin-top:6px}
+.pendiente-bloque b{color:var(--azul-tinta);font-weight:600}
+
+/* ---------- mobile ---------- */
+@media (max-width:960px){
+  .cuerpo{display:block}
+  nav.indice{position:sticky;top:0;height:auto;padding:0;border-right:0;border-bottom:1px solid var(--azul-linea);background:rgba(255,255,255,.96);backdrop-filter:blur(8px);z-index:5}
+  nav.indice .marca{display:none}
+  nav.indice details{padding:0}
+  nav.indice summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:14px 20px;font-size:16px;font-weight:600;color:var(--azul-tinta)}
+  nav.indice summary::-webkit-details-marker{display:none}
+  nav.indice summary::after{content:"Índice";font-weight:400;color:var(--azul);font-size:15px}
+  nav.indice ol{padding:4px 12px 14px}
+  .progreso{display:block;height:3px;background:var(--azul-linea)}
+  .progreso i{display:block;height:100%;width:0;background:var(--azul);transition:width .1s linear}
+  main{padding:10px 20px 90px}
+  section.sec{padding:52px 0 16px}
+  .traduccion .fila,.traduccion .cab{grid-template-columns:1fr;gap:8px}
+  .traduccion .cab span:last-child{display:none}
+  .portada{padding:28px 22px 32px}
+  .portada .logo{width:150px}
+}
+@media (min-width:961px){nav.indice summary{display:none}nav.indice details{display:contents}}
+</style>
+<style>
+/* ---------- simulador ---------- */
+.sim{border:1px solid var(--azul-linea);border-radius:12px;overflow:hidden;margin:26px 0}
+.sim .panel{padding:18px 20px;border-bottom:1px solid var(--azul-linea);background:#F7FAFE}
+.sim .panel h4{font-size:16px;font-weight:600;color:var(--texto-suave);margin:0 0 10px}
+.sim .montos{display:grid;gap:8px}
+.sim .monto{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;font-size:16.5px}
+.sim .monto label{color:var(--azul-tinta)}
+.sim .monto b{font-weight:600}
+.sim .monto .in{display:flex;align-items:center;border:1px solid var(--azul-linea);border-radius:6px;background:#fff;padding:0 10px}
+.sim .monto .in span{color:var(--texto-suave)}
+.sim input[type=number]{width:110px;border:0;font:inherit;font-size:17px;padding:8px 4px;text-align:right;font-variant-numeric:tabular-nums;outline:none;color:var(--azul-tinta);font-weight:600;background:transparent}
+.sim input[type=number]:focus-visible{box-shadow:inset 0 -2px 0 var(--azul)}
+.sim .modo{display:flex;gap:6px;margin-top:14px;background:#fff;border:1px solid var(--azul-linea);border-radius:8px;padding:4px}
+.sim .modo label{flex:1;text-align:center;font-size:15.5px;padding:8px 6px;border-radius:6px;cursor:pointer;color:var(--texto-suave);line-height:1.2}
+.sim .modo input{position:absolute;opacity:0;width:0;height:0}
+.sim .modo input:checked+label{background:var(--azul-suave);color:var(--azul-tinta);font-weight:600}
+.sim .modo input:focus-visible+label{outline:2px solid var(--azul);outline-offset:1px}
+.sim .acciones{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.btn{font:inherit;font-size:16px;font-weight:600;padding:10px 18px;border-radius:8px;border:1px solid var(--azul);background:var(--azul);color:#fff;cursor:pointer}
+.btn:hover{background:var(--azul-oscuro);border-color:var(--azul-oscuro)}
+.btn:focus-visible{outline:2px solid var(--azul-tinta);outline-offset:2px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sec{background:#fff;color:var(--azul);}
+.btn.sec:hover{background:var(--azul-suave)}
+.btn.ok{background:var(--verde);border-color:var(--verde)}
+.btn.ok:hover{background:#12784B;border-color:#12784B}
+.btn.no{background:#fff;color:var(--rojo);border-color:var(--rojo)}
+.btn.no:hover{background:var(--rojo-suave)}
+.btn.chico{font-size:14.5px;padding:7px 12px}
+.sim .grafo{padding:12px 10px 4px;background:#fff}
+.sim svg{width:100%;height:auto;display:block}
+.sim .nodo circle{fill:#fff;stroke:var(--azul);stroke-width:2.5}
+.sim .nodo text{font-family:var(--font);font-size:14px;font-weight:600;fill:var(--azul-tinta);text-anchor:middle}
+.sim .nodo.espera circle{stroke:var(--ambar);stroke-dasharray:5 4}
+.sim .nodo.acepto circle{stroke:var(--verde);fill:var(--verde-suave)}
+.sim .nodo.rechazo circle{stroke:var(--rojo);fill:var(--rojo-suave)}
+.sim .arista line{stroke:#9DB4D3;stroke-width:2.5;marker-end:url(#flecha)}
+.sim .arista.act line{stroke:var(--azul);stroke-width:4;marker-end:url(#flecha-act)}
+.sim .arista.cancelada line{stroke:#C5CFDC;stroke-dasharray:6 6;marker-end:url(#flecha)}
+.sim .arista .pill rect{fill:#fff;stroke:#9DB4D3;stroke-width:1.5;rx:14}
+.sim .arista.act .pill rect{stroke:var(--azul)}
+.sim .arista.cancelada .pill rect{stroke:#C5CFDC}
+.sim .arista .pill text{font-family:var(--font);font-size:14px;font-weight:600;fill:var(--azul-tinta);text-anchor:middle;dominant-baseline:central}
+.sim .arista.cancelada .pill text{fill:var(--texto-suave);text-decoration:line-through}
+.sim .arista .sub{font-family:var(--font);font-size:12.5px;fill:var(--verde);text-anchor:middle;font-weight:600}
+.sim .arista .leyenda{font-family:var(--font);font-size:12px;fill:var(--texto-suave);text-anchor:middle}
+.sim .empresas{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px;background:#F7FAFE;border-top:1px solid var(--azul-linea)}
+.sim .emp{background:#fff;border:1px solid var(--azul-linea);border-radius:10px;padding:12px 14px;font-size:15px;min-width:0}
+.sim .emp .nom{font-weight:700;color:var(--azul-tinta);font-size:15.5px;margin-bottom:6px}
+.sim .emp .l{color:var(--texto-suave);line-height:1.35}
+.sim .emp .l b{color:var(--texto);font-weight:600;font-variant-numeric:tabular-nums}
+.sim .emp .chip{display:inline-block;font-size:13px;font-weight:600;padding:2px 9px;border-radius:99px;margin-top:8px;background:#EEF1F5;color:var(--texto-suave)}
+.sim .emp .chip.espera{background:var(--ambar-suave);color:var(--ambar)}
+.sim .emp .chip.acepto{background:var(--verde-suave);color:var(--verde)}
+.sim .emp .chip.rechazo{background:var(--rojo-suave);color:var(--rojo)}
+.sim .emp .bts{display:flex;gap:6px;margin-top:10px}
+.sim .resultado{padding:16px 20px;font-size:17px;border-top:1px solid var(--azul-linea);background:#fff;min-height:64px}
+.sim .resultado.ok{background:var(--verde-suave);color:#0F5F3D}
+.sim .resultado.no{background:var(--rojo-suave);color:#7A2A1B}
+.sim .resultado.espera{background:var(--ambar-suave);color:#6E4706}
+.sim .resultado b{font-weight:700}
+.pasos{counter-reset:p;list-style:none;padding:0;margin:20px 0}
+.pasos li{position:relative;padding:0 0 14px 42px;font-size:18px}
+.pasos li::before{counter-increment:p;content:counter(p);position:absolute;left:0;top:1px;width:28px;height:28px;border-radius:50%;background:var(--azul);color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center}
+.pasos li b{color:var(--azul-tinta);font-weight:600}
+@media (max-width:640px){
+  .sim .empresas{grid-template-columns:1fr}
+  .sim .monto{grid-template-columns:1fr;gap:4px}
+  .sim .monto .in{justify-content:flex-end}
+}
+
+/* ---------- mockups ---------- */
+.tel{width:300px;max-width:100%;background:#1B2430;border-radius:34px;padding:10px;box-shadow:0 20px 40px -20px rgba(18,49,92,.35);flex:none}
+.tel .pant{background:#F6F8FB;border-radius:26px;overflow:hidden;min-height:520px;display:flex;flex-direction:column;font-size:13px;line-height:1.35;color:var(--texto)}
+.tel .top{background:var(--azul);color:#fff;padding:26px 16px 12px;display:flex;align-items:center;justify-content:space-between}
+.tel .top .lg{width:74px;color:#fff}.tel .top .lg svg{width:100%;height:auto;display:block}
+.tel .top .av{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.tel .cont{padding:14px;flex:1}
+.tel h5{font-size:15px;font-weight:700;color:var(--azul-tinta);margin:0 0 10px}
+.tel .campo{margin-bottom:9px}
+.tel .campo span{display:block;font-size:11.5px;color:var(--texto-suave);margin-bottom:2px}
+.tel .campo div{border:1px solid var(--azul-linea);border-radius:6px;background:#fff;padding:7px 9px;color:var(--azul-tinta);font-weight:600;min-height:31px}
+.tel .campo div.vacio{color:#A7B3C4;font-weight:400}
+.tel .campo div.ok{border-color:var(--verde);background:var(--verde-suave);color:#0F5F3D}
+.tel .b{display:block;text-align:center;background:var(--azul);color:#fff;font-weight:700;border-radius:8px;padding:10px;margin-top:12px;font-size:13.5px}
+.tel .b.ok{background:var(--verde)}
+.tel .b.no{background:#fff;color:var(--rojo);border:1.5px solid var(--rojo);margin-top:8px}
+.tel .b.sec{background:#fff;color:var(--azul);border:1.5px solid var(--azul)}
+.tel .saldo{background:#fff;border:1px solid var(--azul-linea);border-radius:10px;padding:12px;margin-bottom:10px}
+.tel .saldo .k{font-size:11.5px;color:var(--texto-suave)}
+.tel .saldo .v{font-size:22px;font-weight:700;color:var(--azul-tinta);font-variant-numeric:tabular-nums}
+.tel .saldo .dos{display:flex;gap:10px;margin-top:8px}
+.tel .saldo .dos div{flex:1;padding-top:8px;border-top:1px solid var(--azul-linea)}
+.tel .saldo .dos .v{font-size:15px}
+.tel .item{background:#fff;border:1px solid var(--azul-linea);border-radius:8px;padding:9px 10px;margin-bottom:7px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.tel .item .t{font-weight:600;color:var(--azul-tinta)}
+.tel .item .s{font-size:11.5px;color:var(--texto-suave)}
+.tel .item .m{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tel .item .m.neg{color:var(--rojo)}.tel .item .m.pos{color:var(--verde)}
+.tel .item.alerta{border-color:var(--ambar);background:var(--ambar-suave)}
+.tel .tag{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:99px;background:var(--azul-suave);color:var(--azul)}
+.tel .tag.esp{background:var(--ambar-suave);color:var(--ambar)}.tel .tag.ok{background:var(--verde-suave);color:var(--verde)}.tel .tag.no{background:var(--rojo-suave);color:var(--rojo)}
+.tel .aviso{background:var(--azul-suave);border-radius:10px;padding:12px;margin-bottom:12px}
+.tel .aviso b{display:block;color:var(--azul-tinta);margin-bottom:4px;font-size:13.5px}
+.tel .aviso.no{background:var(--rojo-suave)}.tel .aviso.no b{color:var(--rojo)}
+.tel .aviso.ok{background:var(--verde-suave)}.tel .aviso.ok b{color:var(--verde)}
+.tel .cadena{background:#fff;border:1px solid var(--azul-linea);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.tel .cadena .fila{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--azul-linea);font-size:12.5px}
+.tel .cadena .fila:last-child{border:0}
+.tel .cadena .fila b{font-variant-numeric:tabular-nums}
+.tel .cadena .fila.yo{color:var(--azul-tinta);font-weight:600}
+.tel .total{display:flex;justify-content:space-between;font-weight:700;color:var(--azul-tinta);padding-top:8px;margin-top:4px;border-top:2px solid var(--azul-tinta)}
+.tel .tabs{display:flex;background:#fff;border-top:1px solid var(--azul-linea);padding:8px 6px 14px;font-size:10.5px;color:var(--texto-suave)}
+.tel .tabs span{flex:1;text-align:center}.tel .tabs span.on{color:var(--azul);font-weight:700}
+.tel .comp{background:#fff;border:1px solid var(--azul-linea);border-radius:8px;padding:12px;font-size:12px}
+.tel .comp .cab{display:flex;justify-content:space-between;font-weight:700;color:var(--azul-tinta);margin-bottom:8px;font-size:12.5px}
+.tel .comp .r{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #EEF1F5}
+.tel .comp .r span:last-child{font-weight:600;font-variant-numeric:tabular-nums}
+.tel .comp .sello{margin-top:10px;font-size:11px;color:var(--texto-suave);line-height:1.4}
+
+.escr{border:1px solid var(--azul-linea);border-radius:12px;overflow:hidden;background:#F6F8FB;box-shadow:0 20px 40px -24px rgba(18,49,92,.35);font-size:13px;line-height:1.35;margin:20px 0}
+.escr .barra{background:#E9EEF5;padding:8px 12px;display:flex;gap:6px;align-items:center;font-size:12px;color:var(--texto-suave)}
+.escr .barra i{width:10px;height:10px;border-radius:50%;background:#C9D3E0;display:inline-block}
+.escr .barra span{margin-left:8px;background:#fff;border-radius:5px;padding:3px 10px;flex:1;max-width:340px}
+.escr .lay{display:grid;grid-template-columns:150px 1fr;min-height:420px}
+.escr .lat{background:var(--azul-tinta);color:#fff;padding:14px 12px}
+.escr .lat .lg{width:80px;color:#fff;margin-bottom:18px}.escr .lat .lg svg{width:100%;height:auto;display:block}
+.escr .lat div{padding:6px 8px;border-radius:5px;font-size:12.5px;opacity:.75;margin-bottom:2px}
+.escr .lat div.on{background:rgba(255,255,255,.14);opacity:1;font-weight:600}
+.escr .main{padding:16px 18px}
+.escr h5{font-size:16px;font-weight:700;color:var(--azul-tinta);margin:0 0 12px}
+.escr .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.escr .kpi{background:#fff;border:1px solid var(--azul-linea);border-radius:8px;padding:10px 12px}
+.escr .kpi .k{font-size:11.5px;color:var(--texto-suave)}.escr .kpi .v{font-size:19px;font-weight:700;color:var(--azul-tinta);font-variant-numeric:tabular-nums}
+.escr table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--azul-linea);border-radius:8px;overflow:hidden;font-size:12.5px}
+.escr th{text-align:left;font-weight:600;color:var(--texto-suave);font-size:11.5px;padding:8px 10px;background:#F1F5FA;border-bottom:1px solid var(--azul-linea)}
+.escr td{padding:8px 10px;border-bottom:1px solid #EEF1F5;font-variant-numeric:tabular-nums}
+.escr td b{color:var(--azul-tinta);font-weight:600}
+.escr tr.sel td{background:var(--azul-suave)}
+.escr .tag{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:99px;background:var(--azul-suave);color:var(--azul)}
+.escr .tag.esp{background:var(--ambar-suave);color:var(--ambar)}.escr .tag.ok{background:var(--verde-suave);color:var(--verde)}
+.escr .caja{background:#fff;border:1px solid var(--azul-linea);border-radius:8px;padding:12px;margin-top:12px}
+.escr .caja .t{font-weight:700;color:var(--azul-tinta);margin-bottom:8px}
+.escr .caja .fila{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--azul-linea)}
+.escr .caja .fila:last-of-type{border:0}
+.escr .b{display:inline-block;background:var(--azul);color:#fff;font-weight:700;border-radius:6px;padding:7px 12px;margin-top:10px;font-size:12.5px}
+@media (max-width:640px){.escr .lay{grid-template-columns:1fr}.escr .lat{display:flex;gap:4px;flex-wrap:wrap;padding:10px}.escr .lat .lg{display:none}.escr .kpis{grid-template-columns:1fr}}
+
+/* ---------- casos de uso ---------- */
+.caso{display:grid;grid-template-columns:1fr 300px;gap:32px;align-items:start;padding:30px 0;border-top:1px solid var(--azul-linea)}
+.caso:first-of-type{border-top:0;padding-top:10px}
+.caso h3{margin-top:0}
+.caso dl{margin:0}
+.caso dt{font-weight:600;color:var(--azul);font-size:15px;margin-top:14px}
+.caso dd{margin:3px 0 0;font-size:17.5px}
+@media (max-width:860px){.caso{grid-template-columns:1fr}.caso .tel{margin:0 auto}}
+
+/* ---------- módulos de pantallas ---------- */
+.modulos{display:grid;gap:16px;margin:24px 0}
+.modulo{border:1px solid var(--azul-linea);border-radius:12px;padding:20px 22px}
+.modulo h3{margin:0 0 6px;font-size:21px}
+.modulo p{color:var(--texto-suave);font-size:16.5px;margin-bottom:12px}
+.modulo ul{margin:0;padding:0;list-style:none;display:grid;gap:5px}
+.modulo li{padding-left:18px;position:relative;font-size:17px}
+.modulo li::before{content:"";position:absolute;left:0;top:11px;width:8px;height:8px;border-radius:2px;background:var(--azul)}
+.galeria{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;margin:26px 0 10px}
+.galeria figure{margin:0;width:300px}
+.galeria figcaption{font-size:15px;color:var(--texto-suave);text-align:center;margin-top:10px}
+
+/* ---------- modelo de datos ---------- */
+.ent{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
+.ent article{border:1.5px solid var(--azul-linea);border-radius:12px;overflow:hidden}
+.ent h3{margin:0;background:var(--azul-tinta);color:#fff;font-size:18px;padding:12px 16px}
+.ent h3 small{display:block;font-weight:400;font-size:14px;opacity:.8;margin-top:2px}
+.ent ul{list-style:none;margin:0;padding:10px 16px}
+.ent li{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:6px 0;border-bottom:1px solid #EEF1F5;font-size:15.5px}
+.ent li:last-child{border:0}
+.ent li b{font-weight:600;color:var(--azul-tinta);white-space:nowrap}
+.ent li span{color:var(--texto-suave)}
+.ent .rel{padding:10px 16px 14px;font-size:14.5px;color:var(--azul);border-top:1px solid var(--azul-linea);background:#F7FAFE}
+@media (max-width:640px){.ent{grid-template-columns:1fr}.ent li{grid-template-columns:1fr;gap:0}}
+.ciclo{margin:26px 0}
+.ciclo svg{width:100%;height:auto;display:block}
+.ciclo .est rect{rx:8;fill:#fff;stroke:var(--azul);stroke-width:2}
+.ciclo .est.fin rect{fill:var(--verde-suave);stroke:var(--verde)}
+.ciclo .est.mal rect{fill:var(--rojo-suave);stroke:var(--rojo)}
+.ciclo .est text{font-family:var(--font);font-size:14px;font-weight:700;fill:var(--azul-tinta);text-anchor:middle;dominant-baseline:central}
+.ciclo .est.fin text{fill:#0F5F3D}.ciclo .est.mal text{fill:#7A2A1B}
+.ciclo .fl{stroke:#7F97B8;stroke-width:2;fill:none;marker-end:url(#fc)}
+.ciclo .fl.vuelve{stroke-dasharray:5 4}
+.ciclo .lab{font-family:var(--font);font-size:12.5px;fill:var(--texto-suave);text-anchor:middle}
+
+/* ---------- preguntas (casos borde) ---------- */
+.preg{border-top:2px solid var(--azul-tinta);margin:24px 0}
+.preg details{border-bottom:1px solid var(--azul-linea)}
+.preg details:last-child{border-bottom:2px solid var(--azul-tinta)}
+.preg summary{cursor:pointer;list-style:none;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;padding:16px 4px;font-size:19px;font-weight:600;color:var(--azul-tinta)}
+.preg summary::-webkit-details-marker{display:none}
+.preg summary::after{content:"+";font-size:26px;font-weight:400;color:var(--azul);line-height:1;width:24px;text-align:center}
+.preg details[open] summary::after{content:"–"}
+.preg summary:focus-visible{outline:2px solid var(--azul);outline-offset:2px;border-radius:4px}
+.preg .cnt{padding:0 4px 20px;font-size:17.5px}
+.preg .cnt p{margin-bottom:.8em}
+.preg .cnt .prop{background:var(--azul-suave);border-radius:8px;padding:12px 16px;margin-top:8px}
+.preg .cnt .prop b{color:var(--azul);font-weight:600;display:block;font-size:15px;margin-bottom:3px}
+
+/* ---------- supuestos ---------- */
+.sup{list-style:none;margin:22px 0;padding:0;display:grid;gap:8px}
+.sup li{display:grid;grid-template-columns:26px 1fr;gap:12px;align-items:start;padding:12px 14px;border:1px solid var(--azul-linea);border-radius:10px;font-size:17.5px}
+.sup li i{width:22px;height:22px;border:2px solid var(--azul);border-radius:5px;margin-top:3px;position:relative}
+.sup li i::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid var(--azul);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.sup li b{font-weight:600;color:var(--azul-tinta)}
+
+/* ---------- fases ---------- */
+.fases{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:28px 0;position:relative}
+.fases::before{content:"";position:absolute;left:8%;right:8%;top:14px;height:2px;background:var(--azul-linea)}
+.fase{position:relative;padding:40px 14px 0 0}
+.fase::before{content:"";position:absolute;left:0;top:7px;width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--azul)}
+.fase:first-child::before{background:var(--azul)}
+.fase h3{font-size:19px;margin:0 0 4px}
+.fase .cuando{font-size:14.5px;color:var(--azul);font-weight:600;margin-bottom:8px}
+.fase ul{margin:0;padding:0;list-style:none;font-size:15.5px;color:var(--texto-suave)}
+.fase li{padding:3px 0}
+.fase.ahora h3::after{content:"MVP";font-size:11px;font-weight:700;letter-spacing:.04em;background:var(--azul);color:#fff;border-radius:99px;padding:2px 8px;margin-left:8px;vertical-align:middle}
+@media (max-width:760px){.fases{grid-template-columns:1fr;gap:6px}.fases::before{left:7px;right:auto;top:8%;bottom:8%;width:2px;height:auto}.fase{padding:0 0 22px 32px}.fase::before{left:0;top:6px}}
+
+/* ---------- cómo trabajamos / insumos ---------- */
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:22px 0}
+.dos article{border:1px solid var(--azul-linea);border-radius:12px;padding:18px 20px}
+.dos h3{margin:0 0 8px;font-size:20px}
+.dos p{font-size:16.5px;margin-bottom:0}
+@media (max-width:640px){.dos{grid-template-columns:1fr}}
+.insumos{list-style:none;padding:0;margin:22px 0;counter-reset:i}
+.insumos li{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--azul-linea);font-size:17.5px}
+.insumos li::before{counter-increment:i;content:counter(i);width:30px;height:30px;border-radius:50%;background:var(--azul-suave);color:var(--azul);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px}
+.insumos li b{display:block;color:var(--azul-tinta);font-weight:600}
+.insumos li span{color:var(--texto-suave);font-size:16px}
+.cierre{background:var(--azul);color:#fff;border-radius:14px;padding:30px 32px;margin-top:20px}
+.cierre h3{color:#fff;margin:0 0 10px;font-size:26px}
+.cierre p{font-size:18px;opacity:.92}
+.cierre .cont{display:flex;gap:26px;flex-wrap:wrap;margin-top:18px;font-size:17px}
+.cierre a{color:#fff;font-weight:600}
+.cierre .firma-txt{margin-top:22px;font-weight:700;font-size:19px;opacity:.9}
+.cierre .firma{width:150px;color:#fff;margin-top:22px;opacity:.9}.cierre .firma svg{width:100%;height:auto;display:block}
+footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(--texto-suave)}
+</style>
+
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo-cc" viewBox="0 0 634.25 278.2" fill="currentColor">
+<path d="m101.62,58.89c9.06,0,29.2,3.16,29.2,14.97v10.12h-12.54v-5.8c0-5.59-9.91-7.48-16.02-7.48-14.44,0-24.98,10.12-24.98,25.93,0,16.86,10.96,27.83,25.72,27.83,4.53,0,16.23-1.48,16.23-7.38v-5.8h12.54v10.22c0,11.17-19.29,14.76-29.62,14.76-22.66,0-39.1-17.18-39.1-39s16.86-38.37,38.58-38.37"/>
+<path d="m140.09,124.98h7.8v-54.81h-8.33v-10.01h21.71v26.14c0,2.63-.32,4.53-.32,4.53h.21c2.64-5.16,9.28-10.86,18.55-10.86,11.91,0,18.76,6.22,18.76,20.45v24.56h7.8v10.01h-21.19v-31.83c0-6.53-1.69-10.96-8.43-10.96-9.49,0-15.39,8.22-15.39,18.13v14.65h7.69v10.01h-28.88v-10.01Z"/>
+<path d="m239.58,79.97c15.49,0,23.93,11.28,23.93,25.51,0,1.58-.32,4.53-.32,4.53h-37.21c.84,9.91,8.01,14.97,16.13,14.97,8.75,0,15.6-5.69,15.6-5.69l5.16,9.49s-8.22,7.48-21.71,7.48c-17.81,0-28.88-12.86-28.88-28.14,0-16.55,11.17-28.14,27.3-28.14m10.12,22.13c-.21-7.38-4.74-11.8-10.44-11.8-6.85,0-11.7,4.74-12.96,11.8h23.4Z"/>
+<path d="m295.55,79.97c8.85,0,14.23,5.17,16.44,8.22h.21s-.21-1.47-.21-3.48v-3.48h12.54v64.82h7.8v10.01h-28.88v-10.01h7.8v-13.28c0-2.74.21-4.64.21-4.64h-.21s-4.64,8.12-16.13,8.12c-14.55,0-23.93-11.49-23.93-28.14s10.12-28.14,24.35-28.14m2.53,45.01c6.96,0,13.49-5.06,13.49-16.97,0-8.33-4.32-16.55-13.39-16.55-7.27,0-13.49,6.01-13.49,16.65s5.48,16.86,13.39,16.86"/>
+<path d="m343.5,91.25h-8.33v-10.01h21.71v32.25c0,6.43,1.69,10.86,8.43,10.86,9.27,0,14.86-9.49,14.86-19.18v-13.91h-8.22v-10.01h21.61v41.53c0,1.48.84,2.32,2.32,2.32h5.17v9.91h-13.28c-4.74,0-6.96-2.21-6.96-6.01v-2c0-1.37.11-2.53.11-2.53h-.21c-.63,1.79-6.11,11.81-19.6,11.81-10.75,0-17.6-5.8-17.6-20.45v-24.56Z"/>
+<path d="m435.2,79.97c15.49,0,23.93,11.28,23.93,25.51,0,1.58-.32,4.53-.32,4.53h-37.21c.84,9.91,8.01,14.97,16.13,14.97,8.75,0,15.6-5.69,15.6-5.69l5.17,9.49s-8.22,7.48-21.71,7.48c-17.81,0-28.88-12.86-28.88-28.14,0-16.55,11.17-28.14,27.3-28.14m10.12,22.13c-.21-7.38-4.74-11.8-10.44-11.8-6.85,0-11.7,4.74-12.96,11.8h23.4Z"/>
+<path d="m101.62,156c9.06,0,29.2,3.16,29.2,14.97v10.12h-12.54v-5.8c0-5.59-9.91-7.48-16.02-7.48-14.44,0-24.98,10.12-24.98,25.93,0,16.86,10.96,27.83,25.72,27.83,4.53,0,16.23-1.48,16.23-7.38v-5.8h12.54v10.22c0,11.17-19.29,14.76-29.62,14.76-22.66,0-39.1-17.18-39.1-39s16.86-38.37,38.58-38.37"/>
+<path d="m170.13,177.08c16.44,0,29.62,11.7,29.62,28.14s-13.17,28.14-29.51,28.14-29.62-11.59-29.62-28.14,13.17-28.14,29.51-28.14m.11,44.9c8.64,0,15.92-6.75,15.92-16.76s-7.27-16.76-15.92-16.76-16.02,6.85-16.02,16.76,7.27,16.76,16.02,16.76"/>
+<path d="m208.17,222.09h7.8v-31.51c0-1.48-.84-2.21-2.32-2.21h-6.01v-10.01h14.02c4.74,0,7.06,2.21,7.06,6.01v2.42c0,1.16-.21,2.32-.21,2.32h.21c2.74-5.48,9.49-12.02,18.34-12.02,7.48,0,12.86,3.48,14.97,11.7h.21c2.95-6.32,10.12-11.7,18.66-11.7,10.86,0,17.28,6.32,17.28,20.45v24.56h7.8v10.01h-21.19v-32.04c0-6.11-1.16-10.75-7.38-10.75-9.17,0-13.7,9.17-13.7,19.08v13.7h7.8v10.01h-21.08v-32.04c0-5.8-.95-10.75-7.27-10.75-9.49,0-13.81,10.01-13.81,19.71v13.07h7.69v10.01h-28.88v-10.01Z"/>
+<path d="m339.39,177.08c15.49,0,23.93,11.28,23.93,25.51,0,1.58-.32,4.53-.32,4.53h-37.21c.84,9.91,8.01,14.97,16.13,14.97,8.75,0,15.6-5.69,15.6-5.69l5.17,9.49s-8.22,7.48-21.71,7.48c-17.81,0-28.88-12.86-28.88-28.14,0-16.55,11.17-28.14,27.3-28.14m10.12,22.13c-.21-7.38-4.74-11.8-10.44-11.8-6.85,0-11.7,4.74-12.96,11.8h23.4Z"/>
+<path d="m372.07,222.09h7.8v-31.41c0-1.48-.84-2.32-2.32-2.32h-6.01v-10.01h14.02c4.74,0,7.17,2,7.17,6.54v3.16c0,2-.21,3.37-.21,3.37h.21c2.43-7.69,8.85-13.81,17.08-13.81,1.26,0,2.42.21,2.42.21v13.18s-1.37-.21-3.27-.21c-10.86,0-15.7,9.49-15.7,19.6v11.7h7.69v10.01h-28.88v-10.01Z"/>
+<path d="m446.58,177.08c8.96,0,22.03,3.37,22.03,12.86v7.38h-11.59v-3.58c0-3.58-5.48-5.27-10.01-5.27-9.8,0-15.81,6.75-15.81,16.55,0,11.07,7.69,17.08,16.86,17.08,7.59,0,13.81-4.22,16.76-6.54l4.74,9.49c-3.69,3.48-12.02,8.33-22.24,8.33-15.7,0-29.62-10.65-29.62-28.04,0-16.02,12.33-28.25,28.88-28.25"/>
+<path d="m477.78,222.09h7.8v-33.73h-8.33v-10.01h21.71v43.74h7.69v10.01h-28.88v-10.01Zm7.69-64.82h13.49v11.91h-13.49v-11.91Z"/>
+<path d="m543.02,198.9h3.37v-1.79c0-6.85-4.32-9.27-9.91-9.27-8.01,0-15.18,5.16-15.18,5.16l-4.95-9.27s8.33-6.64,21.29-6.64c14.44,0,22.13,7.48,22.13,21.19v21.5c0,1.58.84,2.32,2.32,2.32h4.85v10.01h-12.65c-4.95,0-6.85-2.64-6.85-5.69v-.63c0-1.69.32-2.74.32-2.74h-.21s-4.53,10.33-16.97,10.33c-9.17,0-17.81-5.38-17.81-16.34,0-16.44,21.61-18.13,30.25-18.13m-8.96,24.45c7.27,0,12.44-7.8,12.44-14.54v-1.79h-2.21c-5.27,0-18.02.84-18.02,8.96,0,4.01,2.85,7.38,7.8,7.38"/>
+<path d="m577.21,168h0v-18.72h13.28v65.62c0,4.85,1.05,7.38,5.48,7.38,1.48,0,2.53-.1,2.53-.1v10.75s-2.21.32-4.85.32c-8.54,0-16.44-2.85-16.44-17.5v-47.75Z"/>
+<path d="m590.61,135.04h-13.4l.02-121.64H103.73C53.92,13.4,13.4,54.02,13.4,103.96v128.86H0V103.96C0,46.64,46.53,0,103.73,0h486.9l-.02,135.04Z"/>
+  </symbol>
+</svg>
+
+<!-- ================= PORTADA ================= -->
+<header class="portada" id="inicio">
+  <div class="logo"><svg><use href="#logo-cc"/></svg></div>
+  <div class="titulo">
+    <p class="sobre">Análisis funcional del producto mínimo viable</p>
+    <h1>Cómo entendemos Cheque Comercial y cómo lo vamos a construir</h1>
+    <p class="tesis">El valor de Cheque Comercial no está en la plataforma. Está en la cantidad de deudas cruzadas que existen dentro de una misma cadena de valor. El software existe para encontrarlas y cancelarlas.</p>
+  </div>
+  <div class="pie">
+    <span>Preparado para Pampa y Puertos del Sur Consultores S.A.</span>
+    <span>Sawicki Fintech Solutions · Septiembre 2026<br>Documento de trabajo, enlace privado</span>
+  </div>
+</header>
+
+<div class="cuerpo">
+<nav class="indice" aria-label="Índice del documento">
+  <div class="progreso"><i id="barra"></i></div>
+  <details open>
+    <summary>Cheque Comercial · MVP</summary>
+    <div class="marca"><svg><use href="#logo-cc"/></svg></div>
+    <ol>
+      <li><a href="#s1"><span class="n">1</span>Cómo leímos el proyecto</a></li>
+      <li><a href="#s2"><span class="n">2</span>El mecanismo, en vivo</a></li>
+      <li><a href="#s3"><span class="n">3</span>Martín usa Cheque Comercial</a></li>
+      <li><a href="#s4"><span class="n">4</span>Las pantallas</a></li>
+      <li><a href="#s5"><span class="n">5</span>Cómo se guarda la información</a></li>
+      <li><a href="#s6"><span class="n">6</span>Preguntas que el sistema tiene que saber contestar</a></li>
+      <li><a href="#s7"><span class="n">7</span>Supuestos de trabajo</a></li>
+      <li><a href="#s8"><span class="n">8</span>Fases</a></li>
+      <li><a href="#s9"><span class="n">9</span>Cómo trabajamos</a></li>
+      <li><a href="#s10"><span class="n">10</span>Qué necesitamos de ustedes</a></li>
+      <li><a href="#s11"><span class="n">11</span>Próximo paso</a></li>
+    </ol>
+  </details>
+</nav>
+
+<main>
+
+<!-- ================= 1 ================= -->
+<section class="sec" id="s1">
+  <span class="num">1</span>
+  <h2>Cómo leímos el proyecto</h2>
+  <p class="intro">Antes de proponer una sola pantalla queremos mostrarles qué entendimos. Si acá hay algo que no coincide con lo que ustedes tienen en la cabeza, es mejor descubrirlo ahora que a mitad del desarrollo.</p>
+
+  <p>Cheque Comercial parte de una observación simple sobre las PyMEs: la plata que les falta para pagar es, muchas veces, la misma plata que otras empresas les deben a ellas. El problema de Martín no es que su fábrica no genere valor. Es que ese valor está trabado en cuentas a cobrar mientras sus cuentas a pagar vencen igual.</p>
+
+  <p>La plataforma ataca exactamente ese punto. No presta dinero, no descuenta cheques, no cobra intereses. Registra lo que cada empresa debe y lo que le deben, y busca situaciones donde varias empresas se deben entre sí en círculo. Cuando encuentra una, propone cancelar todas esas deudas de una vez. Nadie transfiere un peso y todas quedan más livianas.</p>
+
+  <p>Eso tiene una consecuencia que ordena todo el proyecto: <strong>el sistema vale por la cantidad de deudas cruzadas que consigue reunir, no por la cantidad de empresas registradas.</strong> Quinientas PyMEs de rubros distintos que no se conocen entre sí no generan ninguna cancelación. Treinta empresas de una misma cadena de valor (un proveedor, sus distribuidores, los comercios que les compran) pueden generar decenas. Por eso el piloto tiene que ser vertical, y por eso la estrategia de "primer eslabón de la cadena de valor" que ustedes definieron en su presentación es la correcta también desde el software.</p>
+
+  <h3>Lo que dice su presentación, y lo que eso significa para el sistema</h3>
+  <p>Tomamos las frases con las que ustedes describen el producto y las tradujimos a lo que la plataforma tiene que hacer para que sean ciertas.</p>
+
+  <div class="traduccion">
+    <div class="cab"><span>Su presentación dice</span><span>El sistema tiene que</span></div>
+    <div class="fila">
+      <div class="dice">Financiación "sin dinero"<small>Portada</small></div>
+      <div class="implica">Cancelar deudas sin que ninguna empresa desembolse efectivo, cruzando lo que cada una debe con lo que le deben.</div>
+    </div>
+    <div class="fila">
+      <div class="dice">Cadena inteligente de cancelación de deudas<small>Solución</small></div>
+      <div class="implica">Detectar círculos cerrados de deuda entre empresas y proponer cancelarlos de una sola vez. Primero con ayuda del equipo de Cheque Comercial; después, de forma automática con el algoritmo que ustedes desarrollaron.</div>
+    </div>
+    <div class="fila">
+      <div class="dice">Pagos garantidos 100%<small>Solución</small></div>
+      <div class="implica">Asegurar que ninguna deuda cambie sin la conformidad expresa de todas las partes, y emitir un comprobante digital que cada empresa pueda presentarle a su contador. La garantía por aval (SGR) es una capa que se suma más adelante.</div>
+    </div>
+    <div class="fila">
+      <div class="dice">Restauramos cadenas de valor<small>Solución</small></div>
+      <div class="implica">Funcionar mejor cuanto más se conozcan las empresas entre sí. El sistema tiene que facilitar que un proveedor invite a sus clientes, y que esos clientes inviten a los suyos.</div>
+    </div>
+    <div class="fila">
+      <div class="dice">Previsibilidad de pagos y cobros<small>Solución</small></div>
+      <div class="implica">Mostrarle a cada PyME, en un solo lugar, cuánto debe, cuánto le deben, qué está en proceso de cancelación y qué ya se canceló.</div>
+    </div>
+    <div class="fila">
+      <div class="dice">Cuentas a cobrar y cuentas a pagar<small>Directo al corazón</small></div>
+      <div class="implica">Tratar cada deuda como un registro con dos dueños, el acreedor y el deudor, donde los dos ven lo mismo y ninguno puede modificarla solo.</div>
+    </div>
+    <div class="fila">
+      <div class="dice">Invitaciones por WhatsApp a cancelar deudas<small>Estrategia de crecimiento</small></div>
+      <div class="implica">Permitir que una empresa registrada cargue una deuda con otra que todavía no está en el sistema, y que esa segunda empresa reciba una invitación con la propuesta ya armada.</div>
+    </div>
+  </div>
+
+  <div class="nota">
+    <strong>Una aclaración sobre la palabra "cheque"</strong>
+    El sistema no emite cheques ni ningún instrumento de pago. Emite comprobantes de cancelación por compensación. Lo mencionamos porque esa diferencia va a aparecer en cada pantalla y en cada texto legal, y conviene que el nombre del producto y el lenguaje de la plataforma cuenten la misma historia.
+  </div>
+</section>
+
+<!-- ================= 2 ================= -->
+<section class="sec" id="s2">
+  <span class="num">2</span>
+  <h2>El mecanismo, en vivo</h2>
+  <p class="intro">En lugar de explicarles cómo funciona la compensación, preferimos que la prueben. Abajo hay tres empresas que se deben entre sí. Cambien los montos, elijan cómo se compensa y decidan por cada empresa.</p>
+
+  <p>Las tres empresas son ficticias pero el circuito es real: Calzados Martín le compra cuero a una curtiembre, la curtiembre paga fletes a una transportista, y la transportista le compró botas de trabajo a Martín para sus choferes. Ninguna puede pagar porque todas esperan cobrar.</p>
+
+  <div class="sim" id="sim">
+    <div class="panel">
+      <h4>Deudas registradas</h4>
+      <div class="montos">
+        <div class="monto"><label><b>Calzados Martín</b> le debe a <b>Curtiembre del Sur</b></label><div class="in"><span>$</span><input type="number" id="m0" value="100000" min="0" step="1000"></div></div>
+        <div class="monto"><label><b>Curtiembre del Sur</b> le debe a <b>Transportes Alvear</b></label><div class="in"><span>$</span><input type="number" id="m1" value="60000" min="0" step="1000"></div></div>
+        <div class="monto"><label><b>Transportes Alvear</b> le debe a <b>Calzados Martín</b></label><div class="in"><span>$</span><input type="number" id="m2" value="80000" min="0" step="1000"></div></div>
+      </div>
+      <div class="modo" role="radiogroup" aria-label="Modo de compensación">
+        <input type="radio" name="modo" id="modoP" value="parcial" checked><label for="modoP">Compensación parcial<br><small>por el importe menor de la cadena</small></label>
+        <input type="radio" name="modo" id="modoE" value="exacto"><label for="modoE">Solo montos exactos<br><small>se compensa únicamente si coinciden</small></label>
+      </div>
+      <div class="acciones">
+        <button class="btn" id="bDetectar">Detectar cadena</button>
+        <button class="btn sec" id="bReiniciar">Volver a empezar</button>
+      </div>
+    </div>
+
+    <div class="grafo">
+      <svg viewBox="0 0 600 400" id="svgSim" aria-label="Gráfico de deudas entre tres empresas">
+        <defs>
+          <marker id="flecha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#9DB4D3"/></marker>
+          <marker id="flecha-act" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0A72E2"/></marker>
+        </defs>
+        <g id="aristas"></g>
+        <g id="nodos"></g>
+      </svg>
+    </div>
+
+    <div class="empresas" id="empresas"></div>
+    <div class="resultado" id="resultado">Presionen <b>Detectar cadena</b> para que el sistema busque un círculo cerrado de deudas.</div>
+  </div>
+
+  <h3>Lo que acaban de ver, paso por paso</h3>
+  <ol class="pasos">
+    <li><b>Detección.</b> El sistema (o el equipo de Cheque Comercial, en la primera etapa) encuentra un círculo cerrado: cada empresa le debe a la siguiente y la última le debe a la primera.</li>
+    <li><b>Reserva.</b> Las deudas involucradas quedan bloqueadas mientras se decide. No pueden entrar en otra cadena al mismo tiempo, y eso evita que una misma deuda se cancele dos veces.</li>
+    <li><b>Conformidad.</b> Cada empresa recibe la propuesta con el detalle y responde con un solo botón. Nadie puede cancelar nada en nombre de otro.</li>
+    <li><b>Resolución.</b> Si todas aceptan, se compensa y cada una recibe su comprobante. Si una sola rechaza o no responde a tiempo, la cadena se anula completa y las deudas vuelven a estar como estaban.</li>
+  </ol>
+
+  <div class="nota">
+    <strong>Por qué el interruptor de arriba es la decisión más importante del proyecto</strong>
+    En la práctica los montos nunca coinciden. Con "solo montos exactos" el sistema casi nunca encuentra cadenas. Con "compensación parcial" las encuentra siempre, pero cada deuda puede quedar con un saldo remanente que sigue vivo para la próxima ronda. Eso cambia cómo se guardan los datos, cómo se muestran los saldos y qué dice el comprobante. Necesitamos su definición antes de programar la primera línea.
+  </div>
+</section>
+<!-- ================= 3 ================= -->
+<section class="sec" id="s3">
+  <span class="num">3</span>
+  <h2>Martín usa Cheque Comercial</h2>
+  <p class="intro">Tomamos a Martín, el dueño de la fábrica de zapatos de su presentación, y lo hicimos recorrer el sistema. Cuatro situaciones que van a pasar todas las semanas, contadas desde su lado de la pantalla.</p>
+
+  <div class="caso">
+    <div>
+      <h3>Martín entra por primera vez</h3>
+      <dl>
+        <dt>La situación</dt>
+        <dd>Curtiembre del Sur, su proveedor de cuero, ya está en Cheque Comercial y le mandó una invitación por WhatsApp: "tenés una deuda de $100.000 con nosotros, podés cancelarla sin poner plata".</dd>
+        <dt>Qué hace Martín</dt>
+        <dd>Abre el enlace desde el celular, escribe su CUIT y su correo. El sistema completa solo la razón social. Acepta los términos y confirma la deuda que la curtiembre cargó a su nombre.</dd>
+        <dt>Qué hace el sistema</dt>
+        <dd>Valida el CUIT contra el padrón, registra quién aceptó los términos y a qué hora, y deja la deuda como "confirmada por ambas partes". Recién ahí puede formar parte de una cadena.</dd>
+        <dt>Resultado</dt>
+        <dd>Martín tiene cuenta en menos de tres minutos y ya ve su primera deuda. No cargó nada: entró porque alguien que le cobra lo invitó.</dd>
+      </dl>
+    </div>
+    <div class="tel"><div class="pant">
+      <div class="top"><div class="lg"><svg><use href="#logo-cc"/></svg></div></div>
+      <div class="cont">
+        <h5>Crear cuenta de empresa</h5>
+        <div class="campo"><span>CUIT</span><div class="ok">30-71234567-8 ✓</div></div>
+        <div class="campo"><span>Razón social</span><div>Calzados Martín S.R.L.</div></div>
+        <div class="campo"><span>Representante legal</span><div>Martín Ferreyra</div></div>
+        <div class="campo"><span>Correo electrónico</span><div class="vacio">martin@calzadosmartin.com.ar</div></div>
+        <div class="campo"><span>Celular (para avisos)</span><div class="vacio">+54 9 299 …</div></div>
+        <div class="aviso"><b>Curtiembre del Sur te invitó</b>Registró una deuda de $ 100.000 a tu nombre. Vas a poder confirmarla al entrar.</div>
+        <div class="item"><span class="s">☑ Acepto los términos y condiciones</span></div>
+        <span class="b">Crear cuenta</span>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="caso">
+    <div>
+      <h3>Martín recibe una propuesta y acepta</h3>
+      <dl>
+        <dt>La situación</dt>
+        <dd>El equipo de Cheque Comercial encontró que la curtiembre le debe a una transportista, y que esa transportista le debe a Martín. Las tres deudas cierran un círculo.</dd>
+        <dt>Qué hace Martín</dt>
+        <dd>Recibe un aviso. Abre la propuesta, ve exactamente cuánto de su deuda se cancela, cuánto de lo que le deben se cobra, y qué le queda pendiente. Toca "Aceptar".</dd>
+        <dt>Qué hace el sistema</dt>
+        <dd>Registra su conformidad, le avisa que faltan las otras dos empresas, y mantiene las deudas reservadas hasta que todas respondan o venza el plazo.</dd>
+        <dt>Resultado</dt>
+        <dd>Cuando las tres aceptan, Martín deja de deber $60.000 y deja de esperar $60.000, en el mismo instante y sin mover un peso. Recibe el comprobante para su contador.</dd>
+      </dl>
+    </div>
+    <div class="tel"><div class="pant">
+      <div class="top"><div class="lg"><svg><use href="#logo-cc"/></svg></div><div class="av">CM</div></div>
+      <div class="cont">
+        <div class="aviso"><b>Propuesta de compensación #0412</b>Vence en 22 horas. Necesita la conformidad de 3 empresas.</div>
+        <div class="cadena">
+          <div class="fila yo"><span>Vos → Curtiembre del Sur</span><b>$ 60.000</b></div>
+          <div class="fila"><span>Curtiembre del Sur → Transportes Alvear</span><b>$ 60.000</b></div>
+          <div class="fila yo"><span>Transportes Alvear → Vos</span><b>$ 60.000</b></div>
+        </div>
+        <div class="saldo">
+          <div class="k">Tu deuda con Curtiembre del Sur</div>
+          <div class="v">$ 100.000 <span style="font-size:13px;color:var(--verde)">− 60.000</span></div>
+          <div class="dos"><div><div class="k">Queda vigente</div><div class="v">$ 40.000</div></div><div><div class="k">Te cobrás de Alvear</div><div class="v" style="color:var(--verde)">$ 60.000</div></div></div>
+        </div>
+        <span class="b ok">Aceptar la compensación</span>
+        <span class="b no">Rechazar</span>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="caso">
+    <div>
+      <h3>Un tercero rechaza y la cadena se cae</h3>
+      <dl>
+        <dt>La situación</dt>
+        <dd>Martín aceptó. La curtiembre aceptó. Pero Transportes Alvear discute el monto: dice que las botas llegaron con fallas y no va a reconocer $80.000.</dd>
+        <dt>Qué hace Martín</dt>
+        <dd>Nada. Recibe un aviso de que la cadena se anuló y el motivo. Sus deudas están exactamente como antes.</dd>
+        <dt>Qué hace el sistema</dt>
+        <dd>Libera las tres deudas, anula la propuesta, y marca la deuda discutida para que el equipo de Cheque Comercial pueda intervenir. No queda ningún saldo a medio camino.</dd>
+        <dt>Resultado</dt>
+        <dd>Martín no perdió nada y aprendió que el sistema nunca lo va a dejar a mitad de una operación. Esa confianza es la que hace que la próxima vez acepte sin dudar.</dd>
+      </dl>
+    </div>
+    <div class="tel"><div class="pant">
+      <div class="top"><div class="lg"><svg><use href="#logo-cc"/></svg></div><div class="av">CM</div></div>
+      <div class="cont">
+        <div class="aviso no"><b>La propuesta #0412 se anuló</b>Transportes Alvear no aceptó. Las deudas volvieron a su estado anterior y no se modificó ningún saldo.</div>
+        <h5>Tus deudas siguen así</h5>
+        <div class="item"><div><div class="t">Curtiembre del Sur</div><div class="s">Vence 30/09 · <span class="tag">Vigente</span></div></div><div class="m neg">− $ 100.000</div></div>
+        <div class="item"><div><div class="t">Transportes Alvear</div><div class="s">Vence 15/10 · <span class="tag esp">En revisión</span></div></div><div class="m pos">+ $ 80.000</div></div>
+        <div class="aviso"><b>Qué pasa ahora</b>El equipo de Cheque Comercial se contactó con Transportes Alvear. Si la deuda se ajusta, te vamos a avisar antes de proponer una nueva cadena.</div>
+        <span class="b sec">Volver al panel</span>
+      </div>
+    </div></div>
+  </div>
+
+  <div class="caso" style="grid-template-columns:1fr">
+    <div>
+      <h3>El equipo de Cheque Comercial arma una cadena a mano</h3>
+      <dl>
+        <dt>La situación</dt>
+        <dd>Es lunes. Hay 28 empresas registradas y 140 deudas confirmadas. Alguien del equipo entra al panel de administración a buscar círculos que compensar.</dd>
+        <dt>Qué hace el equipo</dt>
+        <dd>Filtra las deudas vigentes, elige tres que cierran un círculo y las agrega a una cadena. El panel muestra cuánto se puede compensar y qué remanentes quedarían. Envía la propuesta.</dd>
+        <dt>Qué hace el sistema</dt>
+        <dd>Reserva las deudas, notifica a las tres empresas y arranca el plazo de respuesta. En la primera etapa el sistema sugiere y el equipo decide. Cuando integremos su algoritmo, el sistema va a proponer solo.</dd>
+        <dt>Resultado</dt>
+        <dd>El equipo puede operar el sistema desde el primer día sin depender del motor automático, y va aprendiendo qué cadenas conviene proponer. Ese aprendizaje después se traslada al algoritmo.</dd>
+      </dl>
+      <div class="escr">
+        <div class="barra"><i></i><i></i><i></i><span>admin.chequecomercial.com.ar / cadenas / nueva</span></div>
+        <div class="lay">
+          <div class="lat"><div class="lg"><svg><use href="#logo-cc"/></svg></div><div>Empresas</div><div>Deudas</div><div class="on">Cadenas</div><div>Comprobantes</div><div>Invitaciones</div></div>
+          <div class="main">
+            <h5>Nueva cadena de compensación</h5>
+            <div class="kpis"><div class="kpi"><div class="k">Empresas activas</div><div class="v">28</div></div><div class="kpi"><div class="k">Deuda total registrada</div><div class="v">$ 4.860.000</div></div><div class="kpi"><div class="k">Compensado este mes</div><div class="v">$ 1.120.000</div></div></div>
+            <table>
+              <tr><th>Deudor</th><th>Acreedor</th><th>Monto</th><th>Vence</th><th>Estado</th></tr>
+              <tr class="sel"><td><b>Calzados Martín</b></td><td>Curtiembre del Sur</td><td>$ 100.000</td><td>30/09</td><td><span class="tag">Vigente</span></td></tr>
+              <tr class="sel"><td><b>Curtiembre del Sur</b></td><td>Transportes Alvear</td><td>$ 60.000</td><td>05/10</td><td><span class="tag">Vigente</span></td></tr>
+              <tr class="sel"><td><b>Transportes Alvear</b></td><td>Calzados Martín</td><td>$ 80.000</td><td>15/10</td><td><span class="tag">Vigente</span></td></tr>
+              <tr><td><b>Distribuidora Rivera</b></td><td>Calzados Martín</td><td>$ 145.000</td><td>20/10</td><td><span class="tag esp">Reservada #0409</span></td></tr>
+              <tr><td><b>Curtiembre del Sur</b></td><td>Química Patagonia</td><td>$ 210.000</td><td>02/11</td><td><span class="tag">Vigente</span></td></tr>
+            </table>
+            <div class="caja">
+              <div class="t">Cadena propuesta · 3 empresas</div>
+              <div class="fila"><span>Importe compensable por tramo</span><b>$ 60.000</b></div>
+              <div class="fila"><span>Deuda total que se extingue</span><b>$ 180.000</b></div>
+              <div class="fila"><span>Remanentes que quedan vigentes</span><b>$ 40.000 y $ 20.000</b></div>
+              <div class="fila"><span>Plazo de respuesta</span><b>24 horas</b></div>
+              <span class="b">Enviar propuesta a las 3 empresas</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 4 ================= -->
+<section class="sec" id="s4">
+  <span class="num">4</span>
+  <h2>Las pantallas</h2>
+  <p class="intro">El MVP se organiza en cuatro módulos. Cada uno agrupa varias vistas; las listamos completas para que sepan exactamente qué se construye.</p>
+
+  <div class="modulos">
+    <div class="modulo">
+      <h3>Acceso y registro de empresa</h3>
+      <p>La puerta de entrada. Tiene que ser rápida para la PyME y rigurosa para el sistema.</p>
+      <ul>
+        <li>Ingreso con correo y contraseña, más un código por celular o correo como segundo factor</li>
+        <li>Registro de empresa con validación del CUIT y datos del representante legal</li>
+        <li>Ingreso por invitación, con la deuda que originó la invitación ya visible</li>
+        <li>Aceptación de términos con registro auditable de fecha, hora y usuario</li>
+        <li>Recuperación de contraseña</li>
+      </ul>
+    </div>
+    <div class="modulo">
+      <h3>Panel de la PyME</h3>
+      <p>Lo que Martín ve todos los días. Es la billetera sin dinero.</p>
+      <ul>
+        <li>Resumen: cuánto debe, cuánto le deben, saldo neto y lo que está en proceso</li>
+        <li>Mis deudas y mis cobros, con estado y vencimiento de cada una</li>
+        <li>Carga de una deuda a cobrar, con o sin factura, y envío al deudor para que la confirme</li>
+        <li>Confirmación o rechazo de deudas que otros cargaron a mi nombre</li>
+        <li>Bandeja de propuestas de compensación pendientes, con aceptar y rechazar</li>
+        <li>Historial de compensaciones realizadas</li>
+        <li>Invitar a una empresa que todavía no está en el sistema</li>
+      </ul>
+    </div>
+    <div class="modulo">
+      <h3>Panel de administración</h3>
+      <p>Exclusivo para el equipo de Cheque Comercial. Donde se opera el sistema.</p>
+      <ul>
+        <li>Empresas registradas, con estado de validación y actividad</li>
+        <li>Todas las deudas del sistema, con filtros por empresa, monto, vencimiento y estado</li>
+        <li>Armado de cadenas: elegir deudas, ver el compensable y los remanentes, enviar la propuesta</li>
+        <li>Seguimiento de propuestas: quién aceptó, quién falta, cuánto plazo queda</li>
+        <li>Deudas en disputa y herramientas para resolverlas</li>
+        <li>Indicadores: deuda total registrada, compensado por período, empresas activas</li>
+      </ul>
+    </div>
+    <div class="modulo">
+      <h3>Avisos y comprobantes</h3>
+      <p>Lo que hace que la PyME vuelva y que su contador se quede tranquilo.</p>
+      <ul>
+        <li>Aviso por correo y por WhatsApp de cada propuesta, cada resolución y cada vencimiento de plazo</li>
+        <li>Comprobante digital de compensación por cada empresa, descargable en PDF</li>
+        <li>Detalle de la operación: qué se compensó, con quién, cuándo y qué saldo quedó</li>
+        <li>Número único y verificable de cada comprobante</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Tres vistas más del panel de la PyME</h3>
+  <div class="galeria">
+    <figure><div class="tel"><div class="pant">
+      <div class="top"><div class="lg"><svg><use href="#logo-cc"/></svg></div><div class="av">CM</div></div>
+      <div class="cont">
+        <div class="saldo"><div class="k">Saldo neto</div><div class="v" style="color:var(--rojo)">− $ 20.000</div>
+          <div class="dos"><div><div class="k">Debés</div><div class="v">$ 100.000</div></div><div><div class="k">Te deben</div><div class="v">$ 80.000</div></div></div></div>
+        <div class="item alerta"><div><div class="t">1 propuesta pendiente</div><div class="s">Compensa $ 60.000 · vence en 22 h</div></div><span class="tag esp">Ver</span></div>
+        <h5>Movimientos</h5>
+        <div class="item"><div><div class="t">Curtiembre del Sur</div><div class="s">Vence 30/09 · <span class="tag esp">Reservada</span></div></div><div class="m neg">− $ 100.000</div></div>
+        <div class="item"><div><div class="t">Transportes Alvear</div><div class="s">Vence 15/10 · <span class="tag esp">Reservada</span></div></div><div class="m pos">+ $ 80.000</div></div>
+        <div class="item"><div><div class="t">Distribuidora Rivera</div><div class="s">Compensada 02/09 · <span class="tag ok">Cerrada</span></div></div><div class="m">$ 145.000</div></div>
+      </div>
+      <div class="tabs"><span class="on">Inicio</span><span>Deudas</span><span>Cargar</span><span>Historial</span></div>
+    </div></div><figcaption>Resumen: la billetera sin dinero</figcaption></figure>
+
+    <figure><div class="tel"><div class="pant">
+      <div class="top"><div class="lg"><svg><use href="#logo-cc"/></svg></div><div class="av">CM</div></div>
+      <div class="cont">
+        <h5>Cargar una deuda a cobrar</h5>
+        <div class="campo"><span>¿Quién te debe?</span><div>Transportes Alvear S.A.</div></div>
+        <div class="campo"><span>Monto</span><div>$ 80.000</div></div>
+        <div class="campo"><span>Vencimiento</span><div>15/10/2026</div></div>
+        <div class="campo"><span>Factura (opcional)</span><div class="vacio">Adjuntar factura electrónica</div></div>
+        <div class="campo"><span>Concepto</span><div>Botas de trabajo, 40 pares</div></div>
+        <div class="aviso"><b>Transportes Alvear tiene que confirmarla</b>La deuda entra al sistema recién cuando el deudor la reconoce. Le vamos a avisar por correo y WhatsApp.</div>
+        <span class="b">Enviar para confirmación</span>
+      </div>
+      <div class="tabs"><span>Inicio</span><span>Deudas</span><span class="on">Cargar</span><span>Historial</span></div>
+    </div></div><figcaption>Carga de deuda con confirmación del deudor</figcaption></figure>
+
+    <figure><div class="tel"><div class="pant">
+      <div class="top"><div class="lg"><svg><use href="#logo-cc"/></svg></div><div class="av">CM</div></div>
+      <div class="cont">
+        <div class="aviso ok"><b>Compensación realizada</b>La propuesta #0412 se ejecutó. Este es tu comprobante.</div>
+        <div class="comp">
+          <div class="cab"><span>Comprobante CC-2026-000412</span><span>16/09/2026</span></div>
+          <div class="r"><span>Empresa</span><span>Calzados Martín S.R.L.</span></div>
+          <div class="r"><span>Deuda cancelada con</span><span>Curtiembre del Sur</span></div>
+          <div class="r"><span>Importe compensado</span><span>$ 60.000</span></div>
+          <div class="r"><span>Saldo que queda vigente</span><span>$ 40.000</span></div>
+          <div class="r"><span>Cobro compensado de</span><span>Transportes Alvear</span></div>
+          <div class="r"><span>Importe compensado</span><span>$ 60.000</span></div>
+          <div class="sello">Conformidad de las 3 partes registrada el 16/09/2026 a las 11:42. Verificable en chequecomercial.com.ar/verificar/000412</div>
+        </div>
+        <span class="b">Descargar PDF</span>
+        <span class="b sec">Enviar a mi contador</span>
+      </div>
+    </div></div><figcaption>Comprobante de compensación</figcaption></figure>
+  </div>
+
+  <div class="nota">
+    <strong>Sobre el diseño</strong>
+    Estas pantallas son de trabajo: sirven para que acordemos qué hace cada una, no cómo va a verse. Si ustedes ya tienen un diseño de interfaz validado, lo adaptamos a estas funciones. Si no, el diseño definitivo se hace dentro del proyecto sobre esta base.
+  </div>
+</section>
+<!-- ================= 5 ================= -->
+<section class="sec" id="s5">
+  <span class="num">5</span>
+  <h2>Cómo se guarda la información</h2>
+  <p class="intro">El sistema maneja cuatro cosas: empresas, deudas, cadenas y comprobantes. Todo lo demás se deriva de esas cuatro. Las explicamos en el idioma del negocio, no del programador.</p>
+
+  <div class="ent">
+    <article>
+      <h3>Empresa<small>Quién participa</small></h3>
+      <ul>
+        <li><b>CUIT y razón social</b><span>validados contra el padrón al registrarse</span></li>
+        <li><b>Representante</b><span>nombre, cargo y documento de quien opera la cuenta</span></li>
+        <li><b>Contacto</b><span>correo y celular para los avisos</span></li>
+        <li><b>Estado</b><span>invitada, en validación, activa, suspendida</span></li>
+        <li><b>Términos aceptados</b><span>cuándo, por quién y qué versión</span></li>
+        <li><b>Quién la invitó</b><span>para reconstruir cómo creció la red</span></li>
+      </ul>
+      <div class="rel">Una empresa tiene muchas deudas, como deudora o como acreedora.</div>
+    </article>
+    <article>
+      <h3>Deuda<small>Lo que una empresa le debe a otra</small></h3>
+      <ul>
+        <li><b>Deudor y acreedor</b><span>dos empresas, siempre</span></li>
+        <li><b>Monto original</b><span>lo que se cargó al inicio; nunca se modifica</span></li>
+        <li><b>Saldo vigente</b><span>lo que queda después de cada compensación</span></li>
+        <li><b>Vencimiento</b><span>fecha en que la deuda era exigible</span></li>
+        <li><b>Origen</b><span>factura adjunta, número de comprobante, concepto</span></li>
+        <li><b>Estado</b><span>ver el ciclo de vida más abajo</span></li>
+        <li><b>Quién la cargó y quién la confirmó</b><span>con fecha y hora</span></li>
+      </ul>
+      <div class="rel">Una deuda puede haber pasado por varias cadenas hasta extinguirse.</div>
+    </article>
+    <article>
+      <h3>Cadena de compensación<small>Una propuesta de cancelar varias deudas a la vez</small></h3>
+      <ul>
+        <li><b>Deudas incluidas</b><span>dos o más, que cierran un círculo</span></li>
+        <li><b>Importe compensable</b><span>el que se cancela en cada tramo</span></li>
+        <li><b>Plazo</b><span>hasta cuándo pueden responder las empresas</span></li>
+        <li><b>Respuesta de cada empresa</b><span>aceptó, rechazó o no respondió, con fecha y hora</span></li>
+        <li><b>Estado</b><span>propuesta, en espera, ejecutada, anulada, vencida</span></li>
+        <li><b>Quién la armó</b><span>una persona del equipo o el motor automático</span></li>
+      </ul>
+      <div class="rel">Mientras una cadena está en espera, sus deudas no pueden estar en otra.</div>
+    </article>
+    <article>
+      <h3>Comprobante<small>El papel que va al contador</small></h3>
+      <ul>
+        <li><b>Número único</b><span>correlativo, no se reutiliza nunca</span></li>
+        <li><b>Empresa titular</b><span>cada empresa de la cadena recibe el suyo</span></li>
+        <li><b>Detalle</b><span>qué deuda se compensó, con quién, por cuánto, qué saldo quedó</span></li>
+        <li><b>Prueba de conformidad</b><span>fecha y hora de aceptación de cada parte</span></li>
+        <li><b>Sello de tiempo</b><span>para probar que existía en ese momento</span></li>
+        <li><b>Código de verificación</b><span>cualquiera puede comprobar que es auténtico</span></li>
+      </ul>
+      <div class="rel">Un comprobante nace de una cadena ejecutada y no se puede editar ni borrar.</div>
+    </article>
+  </div>
+
+  <h3>La vida de una deuda</h3>
+  <p>Cada deuda pasa por estados definidos, y el sistema solo permite los pasos que están dibujados. Esto es lo que impide que una deuda se compense dos veces o que quede a mitad de camino.</p>
+
+  <div class="ciclo">
+    <svg viewBox="0 0 720 230" aria-label="Estados por los que pasa una deuda">
+      <defs><marker id="fc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#7F97B8"/></marker></defs>
+      <path class="fl" d="M160,60 L200,60"/><text class="lab" x="180" y="48">el deudor la reconoce</text>
+      <path class="fl" d="M340,60 L380,60"/><text class="lab" x="360" y="48">entra en una cadena</text>
+      <path class="fl" d="M520,60 L560,60"/><text class="lab" x="540" y="48">todas aceptan</text>
+      <path class="fl vuelve" d="M450,82 C450,130 270,130 270,82"/><text class="lab" x="360" y="130">una rechaza, vence el plazo, o queda saldo remanente</text>
+      <path class="fl" d="M90,82 L90,148"/><text class="lab" x="140" y="120">el deudor</text><text class="lab" x="140" y="134">la desconoce</text>
+      <g class="est"><rect x="20" y="38" width="140" height="44"/><text x="90" y="60">Cargada</text></g>
+      <g class="est"><rect x="200" y="38" width="140" height="44"/><text x="270" y="60">Confirmada</text></g>
+      <g class="est"><rect x="380" y="38" width="140" height="44"/><text x="450" y="60">Reservada</text></g>
+      <g class="est fin"><rect x="560" y="38" width="140" height="44"/><text x="630" y="60">Compensada</text></g>
+      <g class="est mal"><rect x="20" y="150" width="140" height="44"/><text x="90" y="172">Rechazada</text></g>
+      <text class="lab" x="360" y="215">Una deuda con saldo remanente vuelve a "Confirmada" con el nuevo saldo y puede entrar en otra cadena.</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ================= 6 ================= -->
+<section class="sec" id="s6">
+  <span class="num">6</span>
+  <h2>Preguntas que el sistema tiene que saber contestar</h2>
+  <p class="intro">Estas son las situaciones que aparecen cuando el sistema se usa de verdad. Para cada una decimos por qué importa y qué haríamos si ustedes no nos indican otra cosa. Su respuesta define el alcance.</p>
+
+  <div class="preg">
+    <details>
+      <summary>Dos empresas aceptan y la tercera deja vencer el plazo sin responder</summary>
+      <div class="cnt">
+        <p>Las dos que aceptaron ya contaban con esa cancelación. Si la cadena se anula en silencio, van a sentir que el sistema les falló.</p>
+        <div class="prop"><b>Lo que proponemos</b>La cadena se anula igual, pero las dos que aceptaron reciben un aviso claro con el motivo y el equipo de Cheque Comercial ve a la empresa que no respondió en una lista de seguimiento. A la tercera falta de respuesta, la empresa queda marcada para revisar.</div>
+      </div>
+    </details>
+    <details>
+      <summary>Dos cadenas posibles necesitan la misma deuda</summary>
+      <div class="cnt">
+        <p>Es la situación más común en cuanto hay más de diez empresas. Una deuda de $100.000 puede cerrar un círculo con la curtiembre o con la distribuidora, pero no con las dos a la vez.</p>
+        <div class="prop"><b>Lo que proponemos</b>Gana la cadena que más deuda total extingue. Si empatan, la que involucra menos empresas, porque es más fácil que todas acepten. En la primera etapa esta elección la hace el equipo con la información en pantalla; el motor automático hereda la regla.</div>
+      </div>
+    </details>
+    <details>
+      <summary>Alguien carga una deuda que el deudor no reconoce</summary>
+      <div class="cnt">
+        <p>Si la deuda entrara al sistema con solo cargarla, cualquiera podría inventar créditos a su favor. Por eso el deudor tiene que confirmarla.</p>
+        <div class="prop"><b>Lo que proponemos</b>La deuda queda en "Cargada" y no puede formar parte de ninguna cadena hasta que el deudor la reconozca. Si la rechaza, el acreedor recibe el motivo. Si adjunta una factura electrónica, más adelante se puede validar automáticamente contra ARCA, lo que reduce las disputas casi a cero.</div>
+      </div>
+    </details>
+    <details>
+      <summary>Una deuda se paga por fuera mientras está reservada en una cadena</summary>
+      <div class="cnt">
+        <p>Martín le transfiere a la curtiembre un viernes, y el lunes el sistema propone compensar esa misma deuda. Si nadie avisa, se cancela dos veces.</p>
+        <div class="prop"><b>Lo que proponemos</b>Cualquiera de las dos partes puede marcar una deuda como "pagada por fuera". Eso anula automáticamente cualquier cadena en la que esté y avisa a las demás empresas. Se pide la conformidad de la otra parte para cerrarla definitivamente.</div>
+      </div>
+    </details>
+    <details>
+      <summary>Las deudas de una cadena vencen en fechas muy distintas</summary>
+      <div class="cnt">
+        <p>Una deuda que vence mañana y otra que vence en 90 días no valen lo mismo, y en Argentina menos todavía. Compensarlas peso por peso beneficia a uno y perjudica a otro.</p>
+        <div class="prop"><b>Lo que proponemos</b>En el MVP se compensa peso por peso y el panel muestra los vencimientos con claridad para que cada empresa decida con esa información. Si ustedes quieren aplicar un ajuste por plazo (una quita o una tasa), es una regla que se agrega después, pero necesitamos saberlo ahora para dejar el lugar preparado.</div>
+      </div>
+    </details>
+    <details>
+      <summary>Una empresa quiere darse de baja con deudas vigentes</summary>
+      <div class="cnt">
+        <p>Sus deudas no desaparecen porque se vaya del sistema. Las otras empresas siguen contando con ellas.</p>
+        <div class="prop"><b>Lo que proponemos</b>La empresa pasa a "suspendida": no puede entrar en cadenas nuevas ni cargar deudas, pero sus deudas vigentes siguen visibles para sus contrapartes y su historial y comprobantes quedan intactos. La baja definitiva la aprueba el equipo de Cheque Comercial cuando no queda nada pendiente.</div>
+      </div>
+    </details>
+    <details>
+      <summary>Una deuda es en cuotas, o tiene una nota de crédito</summary>
+      <div class="cnt">
+        <p>En la vida real las deudas no son un número fijo. Se pagan en partes, se ajustan, se descuentan.</p>
+        <div class="prop"><b>Lo que proponemos</b>Cada cuota se carga como una deuda distinta con su vencimiento. Las notas de crédito reducen el saldo vigente con conformidad de las dos partes, y quedan en el historial. No modelamos cuotas dentro de una misma deuda: es más complejo y no cambia el resultado.</div>
+      </div>
+    </details>
+    <details>
+      <summary>El mismo par de empresas se debe mutuamente</summary>
+      <div class="cnt">
+        <p>Martín le debe $100.000 a la distribuidora y la distribuidora le debe $145.000 a Martín. No hace falta una tercera empresa.</p>
+        <div class="prop"><b>Lo que proponemos</b>Es una cadena de dos y el sistema la trata igual que una de tres: propuesta, conformidad de ambos, compensación por el menor y remanente de $45.000 a favor de Martín. Es el caso más simple y probablemente el más frecuente al principio.</div>
+      </div>
+    </details>
+    <details>
+      <summary>¿Quién puede ver qué?</summary>
+      <div class="cnt">
+        <p>Una PyME no debería ver las deudas que otras dos empresas tienen entre sí, aunque estén en la misma cadena. Pero sí necesita saber que la cadena existe.</p>
+        <div class="prop"><b>Lo que proponemos</b>Cada empresa ve solo sus propios tramos con el detalle completo, y de los demás tramos ve únicamente que existen y que fueron aceptados. El equipo de Cheque Comercial ve todo. La curtiembre nunca sabe cuánto le debe Alvear a Martín.</div>
+      </div>
+    </details>
+  </div>
+</section>
+<!-- ================= 7 ================= -->
+<section class="sec" id="s7">
+  <span class="num">7</span>
+  <h2>Supuestos de trabajo</h2>
+  <p class="intro">Todo lo que sigue lo estamos dando por cierto. Si alguno no lo es, avísennos: cada uno cambia el alcance, y es mucho más barato corregirlo hoy que dentro de dos meses.</p>
+  <ul class="sup">
+    <li><i></i><div><b>Las deudas son en pesos argentinos.</b> El MVP no maneja otras monedas ni deudas dolarizadas.</div></li>
+    <li><i></i><div><b>La garantía por aval (SGR) queda fuera del MVP.</b> El sistema garantiza la conformidad y el registro; la garantía financiera se integra en una fase posterior cuando exista el acuerdo con la SGR.</div></li>
+    <li><i></i><div><b>En la primera etapa las cadenas las arma el equipo de Cheque Comercial</b> desde el panel de administración. El motor automático se incorpora cuando recibamos el algoritmo que ustedes desarrollaron.</div></li>
+    <li><i></i><div><b>Se compensa por el importe menor de la cadena y los saldos remanentes siguen vigentes.</b> Es lo que asumimos si no nos indican "solo montos exactos".</div></li>
+    <li><i></i><div><b>Se compensa peso por peso, sin ajuste por plazo ni tasa.</b> Cualquier quita o valor presente es una regla que se define después.</div></li>
+    <li><i></i><div><b>Toda deuda necesita la confirmación del deudor</b> antes de poder entrar en una cadena. La carga unilateral no alcanza.</div></li>
+    <li><i></i><div><b>El plazo de respuesta a una propuesta es de 24 horas hábiles,</b> configurable por el equipo.</div></li>
+    <li><i></i><div><b>El piloto arranca con una sola cadena de valor</b> de entre 20 y 50 empresas que ya se compran y venden entre sí. Ustedes eligen cuál.</div></li>
+    <li><i></i><div><b>La plataforma es web, se usa desde el navegador del celular o la computadora,</b> sin aplicación para descargar. Se puede "instalar" en el celular como acceso directo.</div></li>
+    <li><i></i><div><b>Los avisos salen por correo electrónico desde el primer día y por WhatsApp cuando Meta apruebe la cuenta y las plantillas,</b> trámite que tiene tiempos propios.</div></li>
+    <li><i></i><div><b>El diseño de las pantallas se hace dentro del proyecto sobre las vistas de este documento,</b> salvo que ustedes ya tengan un diseño validado que prefieran adaptar.</div></li>
+    <li><i></i><div><b>El encuadre regulatorio (BCRA, UIF, ARCA) y los textos legales son responsabilidad de Cheque Comercial y sus asesores.</b> Nosotros construimos lo que ese análisis exija.</div></li>
+    <li><i></i><div><b>El comprobante de compensación es un documento digital con número único, sello de tiempo y código de verificación.</b> Si necesita firma digital con certificado, se agrega como funcionalidad aparte.</div></li>
+  </ul>
+</section>
+
+<!-- ================= 8 ================= -->
+<section class="sec" id="s8">
+  <span class="num">8</span>
+  <h2>Fases</h2>
+  <p class="intro">Cheque Comercial no se construye de una vez. Se construye en capas, y cada capa tiene que funcionar sola antes de sumar la siguiente. Sin fechas ni precios todavía: eso va en la propuesta comercial.</p>
+  <div class="fases">
+    <div class="fase ahora">
+      <h3>Piloto</h3>
+      <div class="cuando">Primera cadena de valor</div>
+      <ul>
+        <li>Registro y validación de empresas</li>
+        <li>Carga y confirmación de deudas</li>
+        <li>Cadenas armadas desde administración</li>
+        <li>Conformidad, compensación y comprobantes</li>
+        <li>Avisos por correo</li>
+      </ul>
+    </div>
+    <div class="fase">
+      <h3>Motor</h3>
+      <div class="cuando">Cuando el piloto tiene datos reales</div>
+      <ul>
+        <li>Integración del algoritmo de Cheque Comercial</li>
+        <li>Detección automática de cadenas</li>
+        <li>Regla de prioridad entre cadenas que compiten</li>
+        <li>Avisos por WhatsApp</li>
+      </ul>
+    </div>
+    <div class="fase">
+      <h3>Integraciones</h3>
+      <div class="cuando">Para escalar sin que crezca el equipo</div>
+      <ul>
+        <li>Validación de facturas contra ARCA</li>
+        <li>Garantía por aval con SGR</li>
+        <li>Invitaciones masivas desde una empresa ancla</li>
+        <li>Reportes para las empresas y para ustedes</li>
+      </ul>
+    </div>
+    <div class="fase">
+      <h3>Escala</h3>
+      <div class="cuando">Más cadenas, más países</div>
+      <ul>
+        <li>Varias cadenas de valor en paralelo</li>
+        <li>Preparación para otras monedas y jurisdicciones</li>
+        <li>Acceso para contadores y estudios</li>
+        <li>Lo que el piloto nos enseñe</li>
+      </ul>
+    </div>
+  </div>
+  <div class="nota">
+    <strong>Por qué el piloto va sin motor automático</strong>
+    Porque el algoritmo necesita datos reales para ajustarse, y esos datos los genera el piloto. Y porque operar las primeras cadenas a mano les va a mostrar cosas que ningún algoritmo predice: qué empresas responden rápido, cuáles discuten, qué montos convienen. Ese conocimiento después se le carga al motor.
+  </div>
+</section>
+
+<!-- ================= 9 ================= -->
+<section class="sec" id="s9">
+  <span class="num">9</span>
+  <h2>Cómo trabajamos</h2>
+  <p class="intro">Ya trabajamos juntos, así que esto lo conocen. Lo dejamos escrito para que sus socios también lo tengan claro.</p>
+  <div class="dos">
+    <article>
+      <h3>Entregas cortas y visibles</h3>
+      <p>Cada dos semanas hay algo nuevo funcionando en un ambiente de prueba al que ustedes entran con su usuario. No hay reuniones de avance con diapositivas: hay pantallas para tocar.</p>
+    </article>
+    <article>
+      <h3>Definiciones por escrito</h3>
+      <p>Cada decisión de negocio que tomemos juntos queda anotada en un documento compartido, con fecha. Cuando alguien pregunte "por qué se hizo así", la respuesta está a un clic.</p>
+    </article>
+    <article>
+      <h3>Datos financieros, cuidado financiero</h3>
+      <p>Copias de seguridad automáticas todos los días, cifrado de la información, registro de cada acción con quién y cuándo, y acceso al panel de administración solo con doble factor.</p>
+    </article>
+    <article>
+      <h3>Tecnología conocida y mantenible</h3>
+      <p>Construimos con React, Next.js, TypeScript y PostgreSQL, herramientas estándar en la industria que cualquier equipo puede continuar. Nada exótico, nada que dependa de una sola persona.</p>
+    </article>
+  </div>
+  <h3>Sobre el servidor</h3>
+  <p>La plataforma necesita un servidor propio funcionando las 24 horas, con copias de seguridad, monitoreo y actualizaciones de seguridad. Es un costo mensual separado del desarrollo, como el alquiler de un local respecto de la obra. Lo administramos nosotros y les rendimos cuentas; el servidor y los datos son de Cheque Comercial, siempre.</p>
+</section>
+
+<!-- ================= 10 ================= -->
+<section class="sec" id="s10">
+  <span class="num">10</span>
+  <h2>Qué necesitamos de ustedes</h2>
+  <p class="intro">Para cerrar el alcance y pasar a la propuesta comercial. Ninguno de estos puntos requiere trabajo técnico de su lado.</p>
+  <ol class="insumos">
+    <li><div><b>El manual de procedimientos y el user flow</b><span>Su presentación los menciona como hechos. Son la base contra la que vamos a contrastar todo este documento.</span></div></li>
+    <li><div><b>Los términos y condiciones</b><span>Definen qué es legalmente una compensación en Cheque Comercial y qué tiene que decir el comprobante.</span></div></li>
+    <li><div><b>El diseño de interfaz, si existe</b><span>Para saber si lo adaptamos o si diseñamos sobre las vistas de la sección 4.</span></div></li>
+    <li><div><b>La cadena de valor del piloto</b><span>Qué empresa ancla, cuántas empresas alrededor, y una idea de cuántas deudas se deben entre sí.</span></div></li>
+    <li><div><b>Sus respuestas a la sección 6</b><span>Alcanza con un "de acuerdo" o "no, así" por cada pregunta.</span></div></li>
+    <li><div><b>El algoritmo de detección de cadenas</b><span>Para la fase Motor. No lo necesitamos para arrancar el piloto, pero sí para dejar el sistema preparado para recibirlo.</span></div></li>
+  </ol>
+</section>
+
+<!-- ================= 11 ================= -->
+<section class="sec" id="s11">
+  <span class="num">11</span>
+  <h2>Próximo paso</h2>
+  <div class="cierre">
+    <h3>Una reunión de una hora para recorrer este documento juntos</h3>
+    <p>Ustedes con sus socios, nosotros con este documento abierto. Vamos punto por punto, anotamos las correcciones y las respuestas de la sección 6. Con eso cerrado, en los días siguientes reciben la propuesta comercial con alcance, etapas, plazos y costos.</p>
+    <p>Este proyecto nos entusiasma porque el mecanismo es simple, el problema es real y ustedes ya hicieron el trabajo difícil de validarlo. Nuestra parte es construirlo bien.</p>
+    <div class="firma-txt">Sawicki Fintech Solutions</div>
+  </div>
+  <footer class="final">
+    Documento de trabajo preparado por Sawicki Fintech Solutions para Pampa y Puertos del Sur Consultores S.A. Enlace privado; no constituye presupuesto ni compromiso de alcance. Las empresas, personas y montos de los ejemplos son ficticios.
+  </footer>
+</section>
+
+</main>
+</div>
+
+<script>
+(function(){
+  var EMP=[{id:0,n:'Calzados Martín',x:300,y:78,ini:'CM'},{id:1,n:'Curtiembre del Sur',x:118,y:318,ini:'CS'},{id:2,n:'Transportes Alvear',x:482,y:318,ini:'TA'}];
+  var DE=[{de:0,a:1},{de:1,a:2},{de:2,a:0}];
+  var R=50, estado='inicial', montos=[], restos=[], comp=0, resp=[null,null,null], modo='parcial';
+  var $=function(s){return document.querySelector(s)}, svgNS='http://www.w3.org/2000/svg';
+  function fmt(n){return '$ '+Math.round(n).toLocaleString('es-AR')}
+  function el(t,a,txt){var e=document.createElementNS(svgNS,t);for(var k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;return e}
+  function leer(){montos=[0,1,2].map(function(i){return Math.max(0,Number($('#m'+i).value)||0)});}
+  function pintar(){
+    var A=$('#aristas'),N=$('#nodos');A.innerHTML='';N.innerHTML='';
+    DE.forEach(function(d,i){
+      var p=EMP[d.de],q=EMP[d.a],dx=q.x-p.x,dy=q.y-p.y,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;
+      var x1=p.x+ux*(R+4),y1=p.y+uy*(R+4),x2=q.x-ux*(R+10),y2=q.y-uy*(R+10);
+      var g=el('g',{class:'arista'+(estado==='detectada'?' act':'')+(estado==='ejecutada'&&restos[i]===0?' cancelada':'')});
+      g.appendChild(el('line',{x1:x1,y1:y1,x2:x2,y2:y2}));
+      var mx=(x1+x2)/2,my=(y1+y2)/2, nx=-uy, ny=ux, off=30;
+      var lx=mx+nx*off, ly=my+ny*off;
+      var etiqueta, sub=null;
+      if(estado==='ejecutada'){ etiqueta=restos[i]===0?fmt(montos[i]):fmt(restos[i]); sub=restos[i]===0?'cancelada':'queda vigente'; }
+      else if(estado==='detectada'){ etiqueta=fmt(montos[i]); sub='compensa '+fmt(comp); }
+      else etiqueta=fmt(montos[i]);
+      var w=Math.max(96,etiqueta.length*8.6+22);
+      var pill=el('g',{class:'pill'});
+      pill.appendChild(el('rect',{x:lx-w/2,y:ly-14,width:w,height:28}));
+      pill.appendChild(el('text',{x:lx,y:ly},etiqueta));
+      g.appendChild(pill);
+      if(sub){ g.appendChild(el('text',{class:sub==='cancelada'?'leyenda':'sub',x:lx,y:ly+30},sub)); }
+      A.appendChild(g);
+    });
+    EMP.forEach(function(e){
+      var cls='nodo'; if(estado==='detectada'){cls+=resp[e.id]===true?' acepto':resp[e.id]===false?' rechazo':' espera'}
+      if(estado==='ejecutada')cls+=' acepto'; if(estado==='anulada'&&resp[e.id]===false)cls+=' rechazo';
+      var g=el('g',{class:cls});g.appendChild(el('circle',{cx:e.x,cy:e.y,r:R}));
+      var partes=e.n.split(' '),l1=partes[0],l2=partes.slice(1).join(' ');
+      g.appendChild(el('text',{x:e.x,y:e.y-4},l1));g.appendChild(el('text',{x:e.x,y:e.y+14},l2));
+      N.appendChild(g);
+    });
+    var E=$('#empresas');E.innerHTML='';
+    EMP.forEach(function(e){
+      var debe=DE.findIndex(function(d){return d.de===e.id}),cobra=DE.findIndex(function(d){return d.a===e.id});
+      var vD=estado==='ejecutada'?restos[debe]:montos[debe], vC=estado==='ejecutada'?restos[cobra]:montos[cobra];
+      var chip='',bts='';
+      if(estado==='detectada'){
+        if(resp[e.id]===true)chip='<span class="chip acepto">Aceptó</span>';
+        else if(resp[e.id]===false)chip='<span class="chip rechazo">Rechazó</span>';
+        else {chip='<span class="chip espera">Pendiente de aprobación</span>';bts='<div class="bts"><button class="btn ok chico" data-r="1" data-e="'+e.id+'">Aceptar</button><button class="btn no chico" data-r="0" data-e="'+e.id+'">Rechazar</button></div>';}
+      } else if(estado==='ejecutada')chip='<span class="chip acepto">Compensado</span>';
+      else if(estado==='anulada')chip=resp[e.id]===false?'<span class="chip rechazo">Rechazó</span>':'<span class="chip">Sin cambios</span>';
+      else chip='<span class="chip">Sin cadena activa</span>';
+      E.insertAdjacentHTML('beforeend','<div class="emp"><div class="nom">'+e.n+'</div><div class="l">Debe <b>'+fmt(vD)+'</b> a '+EMP[DE[debe].a].n+'</div><div class="l">Le deben <b>'+fmt(vC)+'</b></div>'+chip+bts+'</div>');
+    });
+    [].forEach.call(E.querySelectorAll('button'),function(b){b.addEventListener('click',function(){responder(+b.dataset.e,b.dataset.r==='1')})});
+    $('#bDetectar').disabled=estado!=='inicial';
+    [0,1,2].forEach(function(i){$('#m'+i).disabled=estado!=='inicial'});
+  }
+  function res(cls,html){var r=$('#resultado');r.className='resultado '+(cls||'');r.innerHTML=html}
+  function detectar(){
+    leer(); modo=$('#modoE').checked?'exacto':'parcial';
+    if(montos.some(function(m){return m<=0})){res('no','<b>No hay cadena.</b> Una de las deudas está en cero, así que el círculo no se cierra. Con dos empresas que se deben mutuamente también se puede compensar, pero acá mostramos el caso de tres.');return}
+    if(modo==='exacto'&&!(montos[0]===montos[1]&&montos[1]===montos[2])){res('no','<b>No hay cadena de montos exactos.</b> Las deudas son '+montos.map(fmt).join(', ')+'. Con este modo ninguna se cancela hasta que aparezcan tres deudas del mismo importe. Prueben el modo parcial con los mismos números.');return}
+    comp=Math.min.apply(null,montos); resp=[null,null,null]; estado='detectada'; pintar();
+    res('espera','<b>Cadena detectada.</b> Las tres deudas quedaron reservadas. Se puede compensar <b>'+fmt(comp)+'</b> en cada tramo. Ahora cada empresa tiene que aceptar o rechazar la propuesta.');
+  }
+  function responder(e,ok){
+    resp[e]=ok;
+    if(!ok){estado='anulada';pintar();res('no','<b>'+EMP[e].n+' rechazó.</b> La cadena se anuló completa. Las tres deudas volvieron a su estado original y quedaron liberadas para futuras cadenas. Nadie perdió nada.');return}
+    if(resp.every(function(r){return r===true})){
+      restos=montos.map(function(m){return m-comp});estado='ejecutada';pintar();
+      var vivas=restos.filter(function(r){return r>0}).length;
+      res('ok','<b>Compensación ejecutada.</b> Se cancelaron '+fmt(comp*3)+' de deuda total sin que circule dinero. Cada empresa recibe su comprobante.'+(vivas?' Quedan '+vivas+' deuda'+(vivas>1?'s':'')+' con saldo remanente, que siguen vigentes y pueden entrar en la próxima cadena.':' Las tres deudas se extinguieron por completo.'));
+      return}
+    var faltan=EMP.filter(function(x){return resp[x.id]===null}).map(function(x){return x.n});
+    pintar();res('espera','<b>'+EMP[e].n+' aceptó.</b> Falta la conformidad de '+faltan.join(' y ')+'. Mientras tanto las deudas siguen reservadas.');
+  }
+  function reiniciar(){estado='inicial';resp=[null,null,null];restos=[];leer();pintar();res('','Presionen <b>Detectar cadena</b> para que el sistema busque un círculo cerrado de deudas.')}
+  $('#bDetectar').addEventListener('click',detectar);
+  $('#bReiniciar').addEventListener('click',reiniciar);
+  [0,1,2].forEach(function(i){$('#m'+i).addEventListener('input',function(){if(estado==='inicial'){leer();pintar()}})});
+  leer();pintar();
+})();
+</script>
+
+<script>
+(function(){
+  var links=[].slice.call(document.querySelectorAll('nav.indice a'));
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+  var barra=document.getElementById('barra');
+  var det=document.querySelector('nav.indice details');
+  function tick(){
+    var y=window.scrollY+140, cur=-1;
+    secs.forEach(function(s,i){ if(s && s.offsetTop<=y) cur=i; });
+    links.forEach(function(a,i){ a.classList.toggle('activo', i===cur); });
+    if(barra){ var h=document.documentElement; barra.style.width=(100*window.scrollY/(h.scrollHeight-h.clientHeight))+'%'; }
+  }
+  window.addEventListener('scroll',tick,{passive:true}); tick();
+  var mq=window.matchMedia?window.matchMedia('(max-width:960px)'):{matches:false};
+  function ajustar(){ det.open = !mq.matches; }
+  if(mq.addEventListener)mq.addEventListener('change',ajustar); ajustar();
+  links.forEach(function(a){ a.addEventListener('click',function(){ if(mq.matches) det.open=false; }); });
+})();
+</script>
+</body>
+</html>
