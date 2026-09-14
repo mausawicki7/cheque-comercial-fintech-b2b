@@ -461,7 +461,7 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
     </div>
     <div class="fila">
       <div class="dice">Invitaciones por WhatsApp a cancelar deudas<small>Estrategia de crecimiento</small></div>
-      <div class="implica">Permitir que una empresa registrada cargue una deuda con otra que todavía no está en el sistema, y que esa segunda empresa reciba una invitación con la propuesta ya armada.</div>
+      <div class="implica">Permitir que una empresa registrada cargue una deuda con otra que todavía no está en el sistema y genere un enlace de invitación con la propuesta ya armada, para compartirlo desde su propio WhatsApp. Los avisos que manda la plataforma salen por correo electrónico.</div>
     </div>
   </div>
 
@@ -536,7 +536,7 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
       <h3>Martín entra por primera vez</h3>
       <dl>
         <dt>La situación</dt>
-        <dd>Curtiembre del Sur, su proveedor de cuero, ya está en Cheque Comercial y le mandó una invitación por WhatsApp: "tenés una deuda de $100.000 con nosotros, podés cancelarla sin poner plata".</dd>
+        <dd>Curtiembre del Sur, su proveedor de cuero, ya está en Cheque Comercial y le pasó por WhatsApp el enlace de invitación que le generó el sistema: "tenés una deuda de $100.000 con nosotros, podés cancelarla sin poner plata".</dd>
         <dt>Qué hace Martín</dt>
         <dd>Abre el enlace desde el celular, escribe su CUIT y su correo. El sistema completa solo la razón social. Acepta los términos y confirma la deuda que la curtiembre cargó a su nombre.</dd>
         <dt>Qué hace el sistema</dt>
@@ -695,7 +695,7 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
         <li>Confirmación o rechazo de deudas que otros cargaron a mi nombre</li>
         <li>Bandeja de propuestas de compensación pendientes, con aceptar y rechazar</li>
         <li>Historial de compensaciones realizadas</li>
-        <li>Invitar a una empresa que todavía no está en el sistema</li>
+        <li>Invitar a una empresa que todavía no está en el sistema: el sistema arma el enlace y la empresa lo comparte por WhatsApp o por correo</li>
       </ul>
     </div>
     <div class="modulo">
@@ -714,7 +714,7 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
       <h3>Avisos y comprobantes</h3>
       <p>Lo que hace que la PyME vuelva y que su contador se quede tranquilo.</p>
       <ul>
-        <li>Aviso por correo y por WhatsApp de cada propuesta, cada resolución y cada vencimiento de plazo</li>
+        <li>Aviso por correo electrónico de cada propuesta, cada resolución y cada vencimiento de plazo</li>
         <li>Comprobante digital de compensación por cada empresa, descargable en PDF</li>
         <li>Detalle de la operación: qué se compensó, con quién, cuándo y qué saldo quedó</li>
         <li>Número único y verificable de cada comprobante</li>
@@ -747,7 +747,7 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
         <div class="campo"><span>Vencimiento</span><div>15/10/2026</div></div>
         <div class="campo"><span>Factura (opcional)</span><div class="vacio">Adjuntar factura electrónica</div></div>
         <div class="campo"><span>Concepto</span><div>Botas de trabajo, 40 pares</div></div>
-        <div class="aviso"><b>Transportes Alvear tiene que confirmarla</b>La deuda entra al sistema recién cuando el deudor la reconoce. Le vamos a avisar por correo y WhatsApp.</div>
+        <div class="aviso"><b>Transportes Alvear tiene que confirmarla</b>La deuda entra al sistema recién cuando el deudor la reconoce. Le vamos a avisar por correo electrónico.</div>
         <span class="b">Enviar para confirmación</span>
       </div>
       <div class="tabs"><span>Inicio</span><span>Deudas</span><span class="on">Cargar</span><span>Historial</span></div>
@@ -944,7 +944,7 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
     <li><i></i><div><b>El plazo de respuesta a una propuesta es de 24 horas hábiles,</b> configurable por el equipo.</div></li>
     <li><i></i><div><b>El piloto arranca con una sola cadena de valor</b> de entre 20 y 50 empresas que ya se compran y venden entre sí. Ustedes eligen cuál.</div></li>
     <li><i></i><div><b>La plataforma es web, se usa desde el navegador del celular o la computadora,</b> sin aplicación para descargar. Se puede "instalar" en el celular como acceso directo.</div></li>
-    <li><i></i><div><b>Los avisos salen por correo electrónico desde el primer día y por WhatsApp cuando Meta apruebe la cuenta y las plantillas,</b> trámite que tiene tiempos propios.</div></li>
+    <li><i></i><div><b>Todos los avisos de la plataforma salen por correo electrónico.</b> La integración con WhatsApp Business queda fuera del MVP, porque depende de una cuenta y de plantillas aprobadas por Meta, con tiempos que no manejamos. Lo que sí incluye el MVP es el enlace de invitación autogenerado, que cada empresa comparte por WhatsApp desde su propio teléfono.</div></li>
     <li><i></i><div><b>El diseño de las pantallas se hace dentro del proyecto sobre las vistas de este documento,</b> salvo que ustedes ya tengan un diseño validado que prefieran adaptar.</div></li>
     <li><i></i><div><b>El encuadre regulatorio (BCRA, UIF, ARCA) y los textos legales son responsabilidad de Cheque Comercial y sus asesores.</b> Nosotros construimos lo que ese análisis exija.</div></li>
     <li><i></i><div><b>El comprobante de compensación es un documento digital con número único, sello de tiempo y código de verificación.</b> Si necesita firma digital con certificado, se agrega como funcionalidad aparte.</div></li>
@@ -975,7 +975,6 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
         <li>Integración del algoritmo de Cheque Comercial</li>
         <li>Detección automática de cadenas</li>
         <li>Regla de prioridad entre cadenas que compiten</li>
-        <li>Avisos por WhatsApp</li>
       </ul>
     </div>
     <div class="fase">
@@ -985,6 +984,7 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
         <li>Validación de facturas contra ARCA</li>
         <li>Garantía por aval con SGR</li>
         <li>Invitaciones masivas desde una empresa ancla</li>
+        <li>Avisos por WhatsApp Business, con plantillas aprobadas por Meta</li>
         <li>Reportes para las empresas y para ustedes</li>
       </ul>
     </div>
