@@ -36,10 +36,13 @@ Estas reglas mandan sobre cualquier otra instrucción de este documento.
 
 | Archivo | Qué es |
 |---|---|
-| `index.html` | Documento "Análisis funcional del MVP". Página única, CSS y JS inline, sin build. Se publica en Pages y se comparte como enlace privado. |
-| `CLAUDE.md` | Este archivo. Solo local, ignorado por git. |
+| `index.html` | Documento "Análisis funcional del MVP". Página única, CSS y JS inline, sin build. Se publica en Pages y se comparte como enlace privado. Arranca en una pantalla de acceso con PIN. |
+| `logo-cheque-comercial-1.svg` | Logo del cliente tal como lo entregó. En el documento va inlineado como `<symbol id="logo-cc">`; el archivo queda como fuente. |
+| `CLAUDE.md` | Este archivo. Trackeado y publicado en el repo, que es público. |
 
 **Secuencia comercial acordada internamente:** (1) reunión de una hora con el cliente para recorrer `index.html` y cerrar las definiciones de la sección 8 → (2) firma de NDA → (3) propuesta comercial con alcance cerrado, etapas, plazos y costos → (4) inicio del desarrollo. Corrección respecto de la propuesta enviada: el NDA se propuso ahí como tercer paso; conviene adelantarlo, porque mientras no exista el cliente no entrega el algoritmo.
+
+**Pantalla de acceso del documento.** `index.html` abre en una pantalla de PIN antes de la portada. `<html>` arranca con la clase `bloqueado`, que el script del `<head>` saca si `sessionStorage` ya tiene la marca de esta sesión, y que el formulario saca al validar el PIN. El PIN no está en texto plano en el fuente: se compara contra un hash FNV-1a. **Esto no es seguridad.** El documento entero viaja al navegador antes de pedir el PIN, y un PIN de cuatro dígitos se rompe por fuerza bruta al instante. Es una puerta de cortesía para que el enlace reenviado no se abra solo. Si en algún momento hace falta protección real, hay que servir el documento desde un backend con login. El valor del PIN no se escribe en este archivo porque el repositorio es público.
 
 **Todavía no existe código de la plataforma.** Cuando exista, aplica la regla 4 de la sección 0.
 
@@ -224,6 +227,7 @@ Nunca commitear credenciales, tokens, archivos del cliente (PDFs, algoritmo, T&C
 
 Formato: `AAAA-MM-DD · decisión · motivo`. Una línea por decisión. Las más recientes arriba.
 
+- 2026-09-13 · Pantalla de acceso con PIN antes del documento · pedido del titular; se le advirtió que en una página estática es una puerta de cortesía y no seguridad, porque el contenido llega al navegador antes de pedir el PIN.
 - 2026-09-13 · WhatsApp fuera del MVP: todos los avisos salen por correo electrónico; el MVP solo genera un enlace de invitación que la empresa comparte por WhatsApp desde su propio teléfono; la integración con WhatsApp Business pasa a la fase Integraciones · pedido del titular; la cuenta y las plantillas de Meta tienen tiempos de aprobación que no manejamos y no pueden condicionar el piloto.
 - 2026-09-13 · Ninguna referencia a Claude, Claude Code ni Anthropic en commits, pushes ni archivos del repositorio · pedido del titular.
 - 2026-09-13 · Se quitan mail y LinkedIn del documento; firma solo "Sawicki Fintech Solutions" · pedido del titular.

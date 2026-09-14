@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="bloqueado">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script>try{if(sessionStorage.getItem("cc-acceso")==="1")document.documentElement.classList.remove("bloqueado")}catch(e){}</script>
 <style>
 :root{
   --azul:#0A72E2;
@@ -47,6 +48,29 @@ strong{font-weight:600;color:var(--azul-tinta)}
 .portada .tesis{margin-top:34px;max-width:640px;font-size:clamp(20px,2.4vw,26px);line-height:1.4;font-weight:400;border-left:3px solid rgba(255,255,255,.55);padding-left:20px}
 .portada .pie{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:17px;opacity:.85}
 .portada .pie span+span{text-align:right}
+
+/* ---------- acceso ---------- */
+html:not(.bloqueado) #acceso{display:none}
+.bloqueado body{overflow:hidden}
+#acceso{position:fixed;inset:0;z-index:999;background:var(--azul);color:#fff;display:flex;align-items:safe center;justify-content:center;padding:28px 6vw;overflow:auto;overscroll-behavior:contain}
+#acceso .caja{width:100%;max-width:400px}
+#acceso .logo{width:170px;color:#fff;margin-bottom:38px}
+#acceso .logo svg{width:100%;height:auto;display:block}
+#acceso .sobre{font-size:14px;text-transform:uppercase;letter-spacing:.13em;font-weight:700;opacity:.75;margin:0 0 10px}
+#acceso h1{color:#fff;font-size:clamp(27px,5.5vw,34px);margin:0 0 14px}
+#acceso .txt{font-size:17px;line-height:1.5;opacity:.85;margin:0 0 30px}
+#acceso .lbl{display:block;font-size:14.5px;font-weight:600;opacity:.85;margin-bottom:8px}
+#acceso .pin{width:100%;font-family:var(--font);font-size:30px;font-weight:700;letter-spacing:.5em;text-indent:.5em;text-align:center;color:#fff;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.45);border-radius:10px;padding:14px 10px}
+#acceso .pin:focus{outline:none;border-color:#fff;background:rgba(255,255,255,.2)}
+#acceso .pin.mal{border-color:#FFD2C8;background:rgba(255,255,255,.08);animation:sacudir .38s}
+@keyframes sacudir{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
+@media (prefers-reduced-motion:reduce){#acceso .pin.mal{animation:none}}
+#acceso .err{min-height:23px;margin:9px 0 0;font-size:15px;font-weight:600;color:#FFD9CF}
+#acceso .b{width:100%;margin-top:16px;font-family:var(--font);font-size:17px;font-weight:700;color:var(--azul);background:#fff;border:0;border-radius:10px;padding:14px;cursor:pointer}
+#acceso .b:hover{background:var(--azul-suave)}
+#acceso .b:focus-visible,#acceso .pin:focus-visible{outline:2px solid #fff;outline-offset:3px}
+#acceso .pie{margin:32px 0 0;font-size:14.5px;opacity:.7}
+@media (max-height:680px),(max-width:420px){#acceso .logo{width:140px;margin-bottom:22px}#acceso .txt{margin-bottom:22px}#acceso .pie{margin-top:22px}}
 
 /* ---------- layout ---------- */
 .cuerpo{display:grid;grid-template-columns:var(--nav) 1fr;max-width:1200px;margin:0 auto}
@@ -380,6 +404,43 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
 <path d="M620.35,231.71c0,6.22-4.89,11.11-11.24,11.11s-11.31-4.88-11.31-11.11,5.02-10.98,11.31-10.98,11.24,4.89,11.24,10.98ZM600.61,231.71c0,4.89,3.61,8.77,8.57,8.77s8.37-3.88,8.37-8.7-3.55-8.83-8.43-8.83-8.5,3.95-8.5,8.77ZM607.37,237.46h-2.54v-10.98c1-.2,2.41-.33,4.22-.33,2.07,0,3.01.33,3.81.8.6.47,1.07,1.34,1.07,2.41,0,1.2-.94,2.14-2.28,2.54v.13c1.07.4,1.67,1.2,2.01,2.68.33,1.67.54,2.34.8,2.74h-2.74c-.33-.4-.54-1.41-.87-2.68-.2-1.21-.87-1.74-2.28-1.74h-1.2v4.42ZM607.43,231.24h1.21c1.41,0,2.54-.47,2.54-1.61,0-1-.74-1.67-2.34-1.67-.67,0-1.14.07-1.41.13v3.14Z"/>
   </symbol>
 </svg>
+
+<!-- ================= ACCESO ================= -->
+<div id="acceso" role="dialog" aria-modal="true" aria-labelledby="acceso-t">
+  <form class="caja" id="acceso-f" autocomplete="off" novalidate>
+    <div class="logo"><svg><use href="#logo-cc"/></svg></div>
+    <p class="sobre">Documento confidencial</p>
+    <h1 id="acceso-t">Análisis funcional del MVP</h1>
+    <p class="txt">Preparado para Pampa y Puertos del Sur Consultores S.A. Ingresá el PIN que te compartimos para abrirlo.</p>
+    <label class="lbl" for="acceso-pin">PIN de acceso</label>
+    <input id="acceso-pin" class="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" aria-describedby="acceso-e">
+    <p class="err" id="acceso-e" role="alert"></p>
+    <button class="b" type="submit">Abrir el documento</button>
+    <p class="pie">Sawicki Fintech Solutions</p>
+  </form>
+</div>
+<script>
+(function(){
+  var f=document.getElementById('acceso-f'),i=document.getElementById('acceso-pin'),e=document.getElementById('acceso-e');
+  function clave(t){var x=2166136261;for(var n=0;n<t.length;n++){x^=t.charCodeAt(n);x=Math.imul(x,16777619)}return (x>>>0).toString(36)}
+  f.addEventListener('submit',function(ev){
+    ev.preventDefault();
+    if(clave(i.value.trim())==='8kg9wn'){
+      try{sessionStorage.setItem('cc-acceso','1')}catch(err){}
+      document.documentElement.classList.remove('bloqueado');
+    }else{
+      e.textContent='Ese PIN no es correcto. Revisalo y probá de nuevo.';
+      i.classList.remove('mal');void i.offsetWidth;i.classList.add('mal');
+      i.value='';i.focus();
+    }
+  });
+  i.addEventListener('input',function(){
+    e.textContent='';i.classList.remove('mal');
+    if(i.value.length===4){f.requestSubmit?f.requestSubmit():f.dispatchEvent(new Event('submit',{cancelable:true}))}
+  });
+  if(document.documentElement.classList.contains('bloqueado'))i.focus();
+})();
+</script>
 
 <!-- ================= PORTADA ================= -->
 <header class="portada" id="inicio">
