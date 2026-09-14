@@ -144,8 +144,11 @@ section.sec:first-of-type{border-top:0}
 .sim .monto b{font-weight:600}
 .sim .monto .in{display:flex;align-items:center;border:1px solid var(--azul-linea);border-radius:6px;background:#fff;padding:0 10px}
 .sim .monto .in span{color:var(--texto-suave)}
+.sim .campos{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .sim input[type=number]{width:110px;border:0;font:inherit;font-size:17px;padding:8px 4px;text-align:right;font-variant-numeric:tabular-nums;outline:none;color:var(--azul-tinta);font-weight:600;background:transparent}
-.sim input[type=number]:focus-visible{box-shadow:inset 0 -2px 0 var(--azul)}
+.sim input[type=date]{border:0;font:inherit;font-size:16px;padding:8px 2px;outline:none;color:var(--azul-tinta);font-weight:600;background:transparent;font-variant-numeric:tabular-nums;max-width:100%}
+.sim input[type=number]:focus-visible,.sim input[type=date]:focus-visible{box-shadow:inset 0 -2px 0 var(--azul)}
+.sim input:disabled{opacity:.55}
 .sim .modo{display:flex;gap:6px;margin-top:14px;background:#fff;border:1px solid var(--azul-linea);border-radius:8px;padding:4px}
 .sim .modo label{flex:1;text-align:center;font-size:15.5px;padding:8px 6px;border-radius:6px;cursor:pointer;color:var(--texto-suave);line-height:1.2}
 .sim .modo input{position:absolute;opacity:0;width:0;height:0}
@@ -177,6 +180,7 @@ section.sec:first-of-type{border-top:0}
 .sim .arista.act .pill rect{stroke:var(--azul)}
 .sim .arista.cancelada .pill rect{stroke:#C5CFDC}
 .sim .arista .pill text{font-family:var(--font);font-size:14px;font-weight:600;fill:var(--azul-tinta);text-anchor:middle;dominant-baseline:central}
+.sim .arista .pill text.venc{font-size:11.5px;font-weight:600;fill:var(--texto-suave)}
 .sim .arista.cancelada .pill text{fill:var(--texto-suave);text-decoration:line-through}
 .sim .arista .sub{font-family:var(--font);font-size:12.5px;fill:var(--verde);text-anchor:middle;font-weight:600}
 .sim .arista .leyenda{font-family:var(--font);font-size:12px;fill:var(--texto-suave);text-anchor:middle}
@@ -201,8 +205,9 @@ section.sec:first-of-type{border-top:0}
 .pasos li b{color:var(--azul-tinta);font-weight:600}
 @media (max-width:640px){
   .sim .empresas{grid-template-columns:1fr}
-  .sim .monto{grid-template-columns:1fr;gap:4px}
+  .sim .monto{grid-template-columns:1fr;gap:6px}
   .sim .monto .in{justify-content:flex-end}
+  .sim input[type=number]{width:92px}
 }
 
 /* ---------- mockups ---------- */
@@ -543,11 +548,11 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
 
   <div class="sim" id="sim">
     <div class="panel">
-      <h4>Deudas registradas</h4>
+      <h4>Deudas registradas: importe y vencimiento</h4>
       <div class="montos">
-        <div class="monto"><label><b>Calzados Martín</b> le debe a <b>Curtiembre del Sur</b></label><div class="in"><span>$</span><input type="number" id="m0" value="100000" min="0" step="1000"></div></div>
-        <div class="monto"><label><b>Curtiembre del Sur</b> le debe a <b>Transportes Alvear</b></label><div class="in"><span>$</span><input type="number" id="m1" value="60000" min="0" step="1000"></div></div>
-        <div class="monto"><label><b>Transportes Alvear</b> le debe a <b>Calzados Martín</b></label><div class="in"><span>$</span><input type="number" id="m2" value="80000" min="0" step="1000"></div></div>
+        <div class="monto"><label for="m0"><b>Calzados Martín</b> le debe a <b>Curtiembre del Sur</b></label><div class="campos"><div class="in"><span>$</span><input type="number" id="m0" value="100000" min="0" step="1000"></div><div class="in"><input type="date" id="v0" value="2026-09-30" aria-label="Vencimiento de la deuda de Calzados Martín con Curtiembre del Sur"></div></div></div>
+        <div class="monto"><label for="m1"><b>Curtiembre del Sur</b> le debe a <b>Transportes Alvear</b></label><div class="campos"><div class="in"><span>$</span><input type="number" id="m1" value="60000" min="0" step="1000"></div><div class="in"><input type="date" id="v1" value="2026-12-20" aria-label="Vencimiento de la deuda de Curtiembre del Sur con Transportes Alvear"></div></div></div>
+        <div class="monto"><label for="m2"><b>Transportes Alvear</b> le debe a <b>Calzados Martín</b></label><div class="campos"><div class="in"><span>$</span><input type="number" id="m2" value="80000" min="0" step="1000"></div><div class="in"><input type="date" id="v2" value="2026-10-15" aria-label="Vencimiento de la deuda de Transportes Alvear con Calzados Martín"></div></div></div>
       </div>
       <div class="modo" role="radiogroup" aria-label="Modo de compensación">
         <input type="radio" name="modo" id="modoP" value="parcial" checked><label for="modoP">Compensación parcial<br><small>por el importe menor de la cadena</small></label>
@@ -1131,11 +1136,13 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
 (function(){
   var EMP=[{id:0,n:'Calzados Martín',x:300,y:78,ini:'CM'},{id:1,n:'Curtiembre del Sur',x:118,y:318,ini:'CS'},{id:2,n:'Transportes Alvear',x:482,y:318,ini:'TA'}];
   var DE=[{de:0,a:1},{de:1,a:2},{de:2,a:0}];
-  var R=50, estado='inicial', montos=[], restos=[], comp=0, resp=[null,null,null], modo='parcial';
+  var R=50, estado='inicial', montos=[], restos=[], vencs=[], comp=0, resp=[null,null,null], modo='parcial';
   var $=function(s){return document.querySelector(s)}, svgNS='http://www.w3.org/2000/svg';
   function fmt(n){return '$ '+Math.round(n).toLocaleString('es-AR')}
+  function fmtF(iso,corto){if(!iso||iso.length<10)return '';var p=iso.split('-');return p[2]+'/'+p[1]+(corto?'/'+p[0].slice(2):'/'+p[0])}
+  function txtV(iso,extinta){if(extinta)return '';return iso?', vence el <b>'+fmtF(iso)+'</b>':', sin vencimiento cargado'}
   function el(t,a,txt){var e=document.createElementNS(svgNS,t);for(var k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;return e}
-  function leer(){montos=[0,1,2].map(function(i){return Math.max(0,Number($('#m'+i).value)||0)});}
+  function leer(){montos=[0,1,2].map(function(i){return Math.max(0,Number($('#m'+i).value)||0)});vencs=[0,1,2].map(function(i){return $('#v'+i).value});}
   function pintar(){
     var A=$('#aristas'),N=$('#nodos');A.innerHTML='';N.innerHTML='';
     DE.forEach(function(d,i){
@@ -1149,12 +1156,16 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
       if(estado==='ejecutada'){ etiqueta=restos[i]===0?fmt(montos[i]):fmt(restos[i]); sub=restos[i]===0?'cancelada':'queda vigente'; }
       else if(estado==='detectada'){ etiqueta=fmt(montos[i]); sub='compensa '+fmt(comp); }
       else etiqueta=fmt(montos[i]);
-      var w=Math.max(96,etiqueta.length*8.6+22);
+      var extinta=estado==='ejecutada'&&restos[i]===0;
+      var fv=(extinta||!vencs[i])?'':'vence '+fmtF(vencs[i],true);
+      var h=fv?40:28;
+      var w=Math.max(96,Math.max(etiqueta.length*8.6,fv.length*6.4)+22);
       var pill=el('g',{class:'pill'});
-      pill.appendChild(el('rect',{x:lx-w/2,y:ly-14,width:w,height:28}));
-      pill.appendChild(el('text',{x:lx,y:ly},etiqueta));
+      pill.appendChild(el('rect',{x:lx-w/2,y:ly-h/2,width:w,height:h}));
+      pill.appendChild(el('text',{x:lx,y:fv?ly-6:ly},etiqueta));
+      if(fv)pill.appendChild(el('text',{class:'venc',x:lx,y:ly+11},fv));
       g.appendChild(pill);
-      if(sub){ g.appendChild(el('text',{class:sub==='cancelada'?'leyenda':'sub',x:lx,y:ly+30},sub)); }
+      if(sub){ g.appendChild(el('text',{class:sub==='cancelada'?'leyenda':'sub',x:lx,y:ly+h/2+16},sub)); }
       A.appendChild(g);
     });
     EMP.forEach(function(e){
@@ -1177,19 +1188,25 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
       } else if(estado==='ejecutada')chip='<span class="chip acepto">Compensado</span>';
       else if(estado==='anulada')chip=resp[e.id]===false?'<span class="chip rechazo">Rechazó</span>':'<span class="chip">Sin cambios</span>';
       else chip='<span class="chip">Sin cadena activa</span>';
-      E.insertAdjacentHTML('beforeend','<div class="emp"><div class="nom">'+e.n+'</div><div class="l">Debe <b>'+fmt(vD)+'</b> a '+EMP[DE[debe].a].n+'</div><div class="l">Le deben <b>'+fmt(vC)+'</b></div>'+chip+bts+'</div>');
+      E.insertAdjacentHTML('beforeend','<div class="emp"><div class="nom">'+e.n+'</div><div class="l">Debe <b>'+fmt(vD)+'</b> a '+EMP[DE[debe].a].n+txtV(vencs[debe],estado==='ejecutada'&&restos[debe]===0)+'</div><div class="l">Le deben <b>'+fmt(vC)+'</b>'+txtV(vencs[cobra],estado==='ejecutada'&&restos[cobra]===0)+'</div>'+chip+bts+'</div>');
     });
     [].forEach.call(E.querySelectorAll('button'),function(b){b.addEventListener('click',function(){responder(+b.dataset.e,b.dataset.r==='1')})});
     $('#bDetectar').disabled=estado!=='inicial';
-    [0,1,2].forEach(function(i){$('#m'+i).disabled=estado!=='inicial'});
+    [0,1,2].forEach(function(i){$('#m'+i).disabled=estado!=='inicial';$('#v'+i).disabled=estado!=='inicial'});
   }
   function res(cls,html){var r=$('#resultado');r.className='resultado '+(cls||'');r.innerHTML=html}
+  function notaVenc(){
+    var f=vencs.filter(function(x){return x}).sort();
+    if(f.length<3)return '';
+    if(f[0]===f[2])return ' Las tres vencen el mismo día, así que el plazo no entra en discusión.';
+    return ' Las deudas vencen entre el <b>'+fmtF(f[0])+'</b> y el <b>'+fmtF(f[2])+'</b>. El sistema muestra esa diferencia pero no la ajusta: se compensa peso por peso. Si quieren una quita o una tasa por plazo, es una regla aparte que hay que definir.';
+  }
   function detectar(){
     leer(); modo=$('#modoE').checked?'exacto':'parcial';
     if(montos.some(function(m){return m<=0})){res('no','<b>No hay cadena.</b> Una de las deudas está en cero, así que el círculo no se cierra. Con dos empresas que se deben mutuamente también se puede compensar, pero acá mostramos el caso de tres.');return}
     if(modo==='exacto'&&!(montos[0]===montos[1]&&montos[1]===montos[2])){res('no','<b>No hay cadena de montos exactos.</b> Las deudas son '+montos.map(fmt).join(', ')+'. Con este modo ninguna se cancela hasta que aparezcan tres deudas del mismo importe. Prueben el modo parcial con los mismos números.');return}
     comp=Math.min.apply(null,montos); resp=[null,null,null]; estado='detectada'; pintar();
-    res('espera','<b>Cadena detectada.</b> Las tres deudas quedaron reservadas. Se puede compensar <b>'+fmt(comp)+'</b> en cada tramo. Ahora cada empresa tiene que aceptar o rechazar la propuesta.');
+    res('espera','<b>Cadena detectada.</b> Las tres deudas quedaron reservadas. Se puede compensar <b>'+fmt(comp)+'</b> en cada tramo.'+notaVenc()+' Ahora cada empresa tiene que aceptar o rechazar la propuesta.');
   }
   function responder(e,ok){
     resp[e]=ok;
@@ -1197,7 +1214,7 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
     if(resp.every(function(r){return r===true})){
       restos=montos.map(function(m){return m-comp});estado='ejecutada';pintar();
       var vivas=restos.filter(function(r){return r>0}).length;
-      res('ok','<b>Compensación ejecutada.</b> Se cancelaron '+fmt(comp*3)+' de deuda total sin que circule dinero. Cada empresa recibe su comprobante.'+(vivas?' Quedan '+vivas+' deuda'+(vivas>1?'s':'')+' con saldo remanente, que siguen vigentes y pueden entrar en la próxima cadena.':' Las tres deudas se extinguieron por completo.'));
+      res('ok','<b>Compensación ejecutada.</b> Se cancelaron '+fmt(comp*3)+' de deuda total sin que circule dinero. Cada empresa recibe su comprobante.'+(vivas?' Quedan '+vivas+' deuda'+(vivas>1?'s':'')+' con saldo remanente, que siguen vigentes con su vencimiento original y pueden entrar en la próxima cadena.':' Las tres deudas se extinguieron por completo.'));
       return}
     var faltan=EMP.filter(function(x){return resp[x.id]===null}).map(function(x){return x.n});
     pintar();res('espera','<b>'+EMP[e].n+' aceptó.</b> Falta la conformidad de '+faltan.join(' y ')+'. Mientras tanto las deudas siguen reservadas.');
@@ -1205,7 +1222,7 @@ footer.final{max-width:var(--ancho);padding:40px 0 0;font-size:14.5px;color:var(
   function reiniciar(){estado='inicial';resp=[null,null,null];restos=[];leer();pintar();res('','Presionen <b>Detectar cadena</b> para que el sistema busque un círculo cerrado de deudas.')}
   $('#bDetectar').addEventListener('click',detectar);
   $('#bReiniciar').addEventListener('click',reiniciar);
-  [0,1,2].forEach(function(i){$('#m'+i).addEventListener('input',function(){if(estado==='inicial'){leer();pintar()}})});
+  [0,1,2].forEach(function(i){['#m','#v'].forEach(function(pre){$(pre+i).addEventListener('input',function(){if(estado==='inicial'){leer();pintar()}})})});
   leer();pintar();
 })();
 </script>

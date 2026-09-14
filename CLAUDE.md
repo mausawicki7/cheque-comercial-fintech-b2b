@@ -82,7 +82,7 @@ Estas reglas mandan sobre cualquier otra instrucción de este documento.
 
 Tesis de portada: *el valor de Cheque Comercial no está en la plataforma sino en la densidad de deudas cruzadas dentro de una misma cadena de valor; el software existe para encontrarlas y cancelarlas.* Consecuencia: el piloto tiene que ser vertical (una cadena de valor), no horizontal.
 
-Once secciones: (1) cómo leímos el proyecto, cuadro "su presentación dice → el sistema tiene que" · (2) simulador interactivo del mecanismo con interruptor parcial/exacto y flujo de conformidad · (3) cuatro casos de uso con Martín, el zapatero del deck · (4) cuatro módulos con sus vistas y mockups HTML · (5) entidades y ciclo de vida de una deuda · (6) nueve casos borde con propuesta por defecto · (7) trece supuestos · (8) cuatro fases · (9) cómo trabajamos · (10) insumos que pedimos · (11) próximo paso.
+Once secciones: (1) cómo leímos el proyecto, cuadro "su presentación dice → el sistema tiene que" · (2) simulador interactivo del mecanismo con importes y vencimientos editables, interruptor parcial/exacto y flujo de conformidad; al detectar la cadena avisa que los vencimientos se muestran pero no se ajustan (supuesto 5) · (3) cuatro casos de uso con Martín, el zapatero del deck · (4) cuatro módulos con sus vistas y mockups HTML · (5) entidades y ciclo de vida de una deuda · (6) nueve casos borde con propuesta por defecto · (7) trece supuestos · (8) cuatro fases · (9) cómo trabajamos · (10) insumos que pedimos · (11) próximo paso.
 
 **Módulos y vistas del MVP:**
 - *Acceso y registro:* ingreso con segundo factor, registro con validación de CUIT y representante legal, ingreso por invitación con la deuda originante visible, aceptación auditable de términos, recuperación de contraseña.
